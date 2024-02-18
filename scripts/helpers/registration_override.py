@@ -8,13 +8,13 @@ from modules import ui_extra_networks, sd_hijack, shared, sd_models
 from modules.textual_inversion.textual_inversion import Embedding
 
 
-extensions_builtin_path = '../../../../extensions-builtin'
-if extensions_builtin_path not in sys.path:
-    sys.path.append(extensions_builtin_path)
+non_std_module_paths = ['../../../../extensions-builtin/Lora', '../../../../extensions-builtin/a1111-sd-webui-lycoris']
+for module_path in non_std_module_paths:
+    if module_path not in sys.path:
+        sys.path.append(module_path)
 
-# Importing LyCORIS and Lora modules from builtin extensions
-lora = import_module(os.path.join(extensions_builtin_path, "Lora/lora"))
-lycoris = import_module(os.path.join(extensions_builtin_path, "a1111-sd-webui-lycoris/lycoris"))
+lora = import_module("lora")
+lycoris = import_module("lycoris")
 
 
 def parse_filename(path):
