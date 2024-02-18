@@ -1,0 +1,12 @@
+# Ignore everything
+*
+
+# Except for the SD-Lora-Tagger directory
+!SD-Lora-Tagger/
+!SD-Lora-Tagger/*/
+!SD-Lora-Tagger/scripts/
+!SD-Lora-Tagger/scripts/*
+!SD-Lora-Tagger/scripts/helpers/
+!SD-Lora-Tagger/scripts/helpers/*
+!SD-Lora-Tagger/scripts/network_descriptions/.gitkeep
+SD-Lora-Tagger/scripts/network_descriptions/*
