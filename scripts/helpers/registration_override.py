@@ -1,9 +1,20 @@
 import os
 import json
 import html
+import sys
+from importlib import import_module
 
 from modules import ui_extra_networks, sd_hijack, shared, sd_models
 from modules.textual_inversion.textual_inversion import Embedding
+
+
+extensions_builtin_path = '../../../../extensions-builtin'
+if extensions_builtin_path not in sys.path:
+    sys.path.append(extensions_builtin_path)
+
+# Importing LyCORIS and Lora modules from builtin extensions
+lora = import_module(os.path.join(extensions_builtin_path, "Lora/lora"))
+lycoris = import_module(os.path.join(extensions_builtin_path, "a1111-sd-webui-lycoris/lycoris"))
 
 
 def parse_filename(path):
@@ -117,6 +128,93 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
         return default
 
 
+class LoraPage(ui_extra_networks.ExtraNetworksPage):
+    def __init__(self, descriptions_path):
+        super().__init__('Lora')
+        self.descriptions_path = descriptions_path
+
+    def refresh(self):
+        lora.list_available_loras()
+
+    def list_items(self):
+        for name, lora_on_disk in lora.available_loras.items():
+            path, _ext = os.path.splitext(lora_on_disk.filename)
+            alias = lora_on_disk.get_alias()
+            prompt = (json.dumps(f"<lora:{alias}") + " + " + json.dumps(f':{shared.opts.extra_networks_default_multiplier}') + " + " + json.dumps(">"))
+            metadata =  json.dumps(lora_on_disk.metadata, indent=4) if lora_on_disk.metadata else None
+            possible_tags = lora_on_disk.metadata.get('ss_tag_frequency', {}) if lora_on_disk.metadata is not None else {}
+            if isinstance(possible_tags, str):
+                possible_tags = {}
+                shared.log.debug(f'Lora has invalid metadata: {path}')
+            tags = {}
+            for tag in possible_tags.keys():
+                if '_' not in tag:
+                    tag = f'0_{tag}'
+                words = tag.split('_', 1)
+                tags[' '.join(words[1:])] = words[0]
+            # shared.log.debug(f'Lora: {path}: name={name} alias={alias} tags={tags}')
+
+            with open(os.path.join(self.descriptions_path, f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt")) as f:
+                search_terms = f.read()
+                print(f"SD Lora Tagger: {search_terms}")
+
+            yield {
+                "name": name,
+                "filename": path,
+                "fullname": lora_on_disk.filename,
+                "hash": lora_on_disk.shorthash,
+                "preview": self.find_preview(path),
+                "description": self.find_description(path),
+                "search_term": search_terms,  # self.search_terms_from_path(lora_on_disk.filename),
+                "prompt": prompt,
+                "local_preview": f"{path}.{shared.opts.samples_format}",
+                "metadata": metadata,
+                "tags": tags,
+            }
+
+    def allowed_directories_for_previews(self):
+        return [shared.cmd_opts.lora_dir]
+
+
+class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
+    def __init__(self, descriptions_path, base_name='lyco', model_dir=shared.cmd_opts.lyco_dir):
+        super().__init__('LyCORIS')
+        self.descriptions_path = descriptions_path
+        self.base_name = base_name
+        self.model_dir = model_dir
+
+    def refresh(self):
+        lycoris.list_available_lycos(self.model_dir)
+
+    def list_items(self):
+        for index, (name, lyco_on_disk) in enumerate(lycoris.available_lycos.items()):
+            path, ext = os.path.splitext(lyco_on_disk.filename)
+            sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
+
+            with open(os.path.join(self.descriptions_path, f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt")) as f:
+                search_terms = f.read()
+                print(f"SD Lora Tagger: {search_terms}")
+
+            yield {
+                "name": name,
+                "filename": path,
+                "preview": self.find_preview(path),
+                "description": self.find_description(path),
+                "search_term": search_terms,  # self.search_terms_from_path(lyco_on_disk.filename),
+                "prompt": (
+                    json.dumps(f"<{self.base_name}:{name}")
+                    + " + " + json.dumps(f':{shared.opts.extra_networks_default_multiplier}')
+                    + " + " + json.dumps(">")
+                ),
+                "local_preview": f"{path}.{shared.opts.samples_format}",
+                "metadata": json.dumps(lyco_on_disk.metadata, indent=4) if lyco_on_disk.metadata else None,
+                "sort_keys": {'default': index, **sort_keys},
+            }
+
+    def allowed_directories_for_previews(self):
+        return [self.model_dir]
+
+
 def register_embeddings(descriptions_path):
     ui_extra_networks.register_page(EmbeddingsPage(descriptions_path))
 
@@ -129,5 +227,10 @@ def register_checkpoints(descriptions_path):
     ui_extra_networks.register_page(CheckpointsPage(descriptions_path))
 
 
-def register_loras():
-    pass
+def register_loras(descriptions_path):
+    ui_extra_networks.register_page(LoraPage(descriptions_path))
+
+
+def register_lycos(descriptions_path):
+    ui_extra_networks.register_page(LyCORISPage(descriptions_path))
+

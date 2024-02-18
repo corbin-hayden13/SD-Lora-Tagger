@@ -7,7 +7,8 @@ from modules.ui_extra_networks import extra_pages
 import gradio as gr
 
 from scripts.helpers.utils import init_extra_network_tags, load_tags
-from scripts.helpers.registration_override import register_embeddings, register_hypernetworks, register_checkpoints
+from scripts.helpers.registration_override import register_embeddings, register_hypernetworks, register_checkpoints,\
+    register_loras
 
 """
 TODO: Setting to switch between AUTOMATIC1111/stable-diffusion-webui and vladmandic/automatic (SD.Next)
@@ -63,6 +64,7 @@ def register_pages():
     register_embeddings(os.path.join(lora_tagger_dir, "network_descriptions/embeddings/"))
     register_hypernetworks(os.path.join(lora_tagger_dir, "network_descriptions/hypernetworks/"))
     register_checkpoints(os.path.join(lora_tagger_dir, "network_descriptions/Stable-diffusion/"))
+    register_loras(os.path.join(lora_tagger_dir, "network_descriptions/Lora/"))
 
 
 class LoraTagger(scripts.Script):
