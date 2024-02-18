@@ -2,12 +2,17 @@ import os
 import shutil
 
 import modules.scripts as scripts
+from modules.scripts import script_callbacks
+from modules.ui_extra_networks import extra_pages
 import gradio as gr
 
 from scripts.helpers.utils import init_extra_network_tags, load_tags
+from scripts.helpers.embedding_registrator import register_embeddings
 
 """
 TODO: Setting to switch between AUTOMATIC1111/stable-diffusion-webui and vladmandic/automatic (SD.Next)
+TODO: Can search by something called "search_terms"; Defined as the absolute file path of all extra networks currently
+  - Register extra network pages to add custom search_terms
 """
 
 
@@ -53,6 +58,17 @@ def input_changed(*args):
     print(f"SD Lora Tagger: {args}")
 
 
+def register_pages():
+    print(f"SD Lora Tagger: extra_pages as is:\n{extra_pages}")
+    index = 0
+    for a in range(len(extra_pages)):
+        if extra_pages[a].title == "Textual Inversion":
+            index = a
+
+    del extra_pages[index]
+    register_embeddings(os.path.join(lora_tagger_dir, "network_descriptions/embeddings/"))
+
+
 class LoraTagger(scripts.Script):
     def title(self):
         return "SD Lora Tagger"  # Extension for Bounty https://civitai.com/bounties/1183/extension-for-tagging-loras
@@ -89,3 +105,5 @@ class LoraTagger(scripts.Script):
         except KeyError:
             pass
 
+
+script_callbacks.on_before_ui(register_pages)
