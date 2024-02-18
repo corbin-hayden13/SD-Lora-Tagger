@@ -20,32 +20,7 @@ TODO: Can search by something called "search_terms"; Defined as the absolute fil
 txt2img_extras_refresh_comp = None
 lora_tagger_dir = scripts.basedir()
 config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
-folder_names = ["Lora", "LyCORIS", "embeddings"]
 models_dir = f'./{lora_tagger_dir}/../../models/'
-is_sd_next = None
-
-with open(config_path, "r") as f:
-    is_sd_next = True if f.read().split("=")[1] == "True" else False
-
-override_file = 'sdNextExtraNetworksOverride.js' if is_sd_next else 'webuiExtraNetworksOverride.js'
-undo_file = 'sdNextExtraNetworksOverride.js' if not is_sd_next else 'webuiExtraNetworksOverride.js'
-
-source_path_override = os.path.join(lora_tagger_dir, f"staging\\{override_file}")
-source_path_undo = os.path.join(lora_tagger_dir, f"javascript\\{undo_file}")
-destination_path_override = os.path.join(lora_tagger_dir, f"javascript\\{override_file}")
-
-try:
-    shutil.copy(source_path_override, destination_path_override)
-    print(f"SD Lora Tagger: Successfully copied js file = {os.path.exists(destination_path_override)}")
-except Exception as e:
-    print(f"Could not copy {override_file} from {os.path.join(lora_tagger_dir, 'staging')} directory")
-
-if os.path.exists(source_path_undo):
-    try:
-        os.remove(source_path_undo)
-        print(f"SD Lora Tagger: Successfully deleted js file = {not os.path.exists(source_path_undo)}")
-    except Exception as e:
-        print(f"Could not delete {undo_file} from {os.path.join(lora_tagger_dir), 'javascript'} directory")
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 
