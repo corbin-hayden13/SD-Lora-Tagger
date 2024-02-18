@@ -7,7 +7,7 @@ from modules.ui_extra_networks import extra_pages
 import gradio as gr
 
 from scripts.helpers.utils import init_extra_network_tags, load_tags
-from scripts.helpers.embedding_registrator import register_embeddings
+from scripts.helpers.registration_override import register_embeddings, register_hypernetworks, register_checkpoints
 
 """
 TODO: Setting to switch between AUTOMATIC1111/stable-diffusion-webui and vladmandic/automatic (SD.Next)
@@ -59,14 +59,10 @@ def input_changed(*args):
 
 
 def register_pages():
-    print(f"SD Lora Tagger: extra_pages as is:\n{extra_pages}")
-    index = 0
-    for a in range(len(extra_pages)):
-        if extra_pages[a].title == "Textual Inversion":
-            index = a
-
-    del extra_pages[index]
+    extra_pages.clear()
     register_embeddings(os.path.join(lora_tagger_dir, "network_descriptions/embeddings/"))
+    register_hypernetworks(os.path.join(lora_tagger_dir, "network_descriptions/hypernetworks/"))
+    register_checkpoints(os.path.join(lora_tagger_dir, "network_descriptions/Stable-diffusion/"))
 
 
 class LoraTagger(scripts.Script):

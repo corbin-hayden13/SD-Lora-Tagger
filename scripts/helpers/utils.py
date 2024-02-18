@@ -14,6 +14,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
         "LyCORIS": ["safetensors"],
         "embeddings": ["pt"],
         "hypernetworks": ["pt"],
+        "Stable-diffusion": ["safetensors", "ckpt"],
     }
 
     if included_networks is not None:
