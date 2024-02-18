@@ -92,13 +92,13 @@ class LoraTagger(scripts.Script):
             if kwargs["elem_id"] == "txt2img_prompt":
                 pos_prompt_comp = component
 
-            if kwargs["elem_id"] == "txt2img_extra_search":
+            """ if kwargs["elem_id"] == "txt2img_extra_search":
                 with gr.Row() as new_layout:
                     tag_search_dropdown = gr.Dropdown(info="Search by tags...", multiselect=True,
                                                       show_label=False, choices=list(load_tags(os.path.join(lora_tagger_dir, "network_descriptions/")).keys()))
                     tag_search_dropdown.input(fn=input_changed, inputs=tag_search_dropdown)
                     name_search = component
-                return new_layout
+                return new_layout """
 
         except KeyError:
             pass
