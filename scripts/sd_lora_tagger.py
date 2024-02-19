@@ -7,6 +7,7 @@ from modules.ui_extra_networks import extra_pages
 
 from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
+from scripts.edit_tags_ui import on_ui_tabs
 
 """
 TODO: Change search box from textbox to dropdown to allow for much easier tag searching
@@ -67,3 +68,4 @@ class LoraTagger(scripts.Script):
 callback_map["callbacks_before_ui"] = [item for item in callback_map["callbacks_before_ui"]
                                        if os.path.basename(item.script) not in override_before_ui]
 script_callbacks.on_before_ui(register_pages)
+script_callbacks.on_ui_tabs(on_ui_tabs)
