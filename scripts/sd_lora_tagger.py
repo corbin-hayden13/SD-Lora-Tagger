@@ -1,13 +1,9 @@
 import os
-import shutil
 
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
-from modules import extra_networks
 from modules.script_callbacks import callback_map
-
 from modules.ui_extra_networks import extra_pages
-import gradio as gr
 
 from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
