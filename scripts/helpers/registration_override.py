@@ -46,7 +46,12 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
     def list_items(self):
         embeddings = list(sd_hijack.model_hijack.embedding_db.word_embeddings.values())
         if len(embeddings) == 0: # maybe not loaded yet, so lets just look them up
-            for root, _dirs, fns in os.walk(shared.opts.embeddings_dir, followlinks=True):
+            try:
+                embeddings_dir = shared.opts.embeddings_dir
+            except AttributeError:
+                embeddings_dir = shared.cmd_opts.embeddings_dir
+
+            for root, _dirs, fns in os.walk(embeddings_dir, followlinks=True):
                 for fn in fns:
                     if fn.lower().endswith(".pt"):
                         embedding = Embedding(0, fn)
