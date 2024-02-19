@@ -189,11 +189,15 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
 
 
 class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
-    def __init__(self, descriptions_path, base_name='lyco', model_dir=shared.cmd_opts.lyco_dir):
+    def __init__(self, descriptions_path, base_name='lyco', model_dir=None):
         super().__init__('LyCORIS')
+        # If LyCORIS is not installed, cannot pre-compute shared.cmd_opts.lyco_dir so it cannot be a default arg
+        if model_dir is None:
+            self.model_dir = shared.cmd_opts.lyco_dir
+        else:
+            self.model_dir = model_dir
         self.descriptions_path = descriptions_path
         self.base_name = base_name
-        self.model_dir = model_dir
 
     def refresh(self):
         lycoris.list_available_lycos(self.model_dir)
