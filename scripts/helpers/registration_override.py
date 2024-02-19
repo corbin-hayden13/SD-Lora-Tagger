@@ -104,8 +104,7 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
         try:
             network_dir = shared.opts.hypernetwork_dir
         except AttributeError:  # For use in AUTOMATIC1111/stable-diffusion-webui
-            from modules.shared_cmd_options import cmd_opts
-            network_dir = cmd_opts.hypernetwork_dir
+            network_dir = shared.cmd_opts.hypernetwork_dir
 
         return [network_dir, self.descriptions_path]
 
@@ -141,7 +140,12 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
             }
 
     def allowed_directories_for_previews(self):
-        default = [v for v in [shared.opts.ckpt_dir, shared.opts.diffusers_dir, sd_models.model_path] if v is not None]
+        try:
+            valid_paths = [shared.opts.ckpt_dir, shared.opts.diffusers_dir, sd_models.model_path]
+        except AttributeError:  # For use in AUTOMATIC1111/stable-diffusion-webui
+            valid_paths = [shared.cmd_opts.ckpt_dir, sd_models.model_path]
+
+        default = [v for v in valid_paths if v is not None]
         default.append(self.descriptions_path)
         return default
 
