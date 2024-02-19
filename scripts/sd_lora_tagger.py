@@ -24,11 +24,6 @@ models_dir = './models'
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 
 
-def set_is_sd_next(cond):
-    with open(config_path, "w") as f:
-        f.write(f"sd.next={cond}")
-
-
 def input_changed(*args):
     print(f"SD Lora Tagger: {args}")
 
