@@ -39,7 +39,7 @@ def register_pages():
                          os.path.join(lora_tagger_dir, "network_descriptions/hypernetworks/"),
                          os.path.join(lora_tagger_dir, "network_descriptions/Stable-diffusion/"),
                          os.path.join(lora_tagger_dir, "network_descriptions/Lora/"),
-                         os.path.join(lora_tagger_dir, "newwork_descriptions/LyCORIS/"))
+                         os.path.join(lora_tagger_dir, "network_descriptions/LyCORIS/"))
 
     register_all(description_paths)
 
