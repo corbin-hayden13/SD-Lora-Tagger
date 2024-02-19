@@ -13,8 +13,20 @@ for module_path in non_std_module_paths:
     if module_path not in sys.path:
         sys.path.append(module_path)
 
-lora = import_module("lora")
-lycoris = import_module("lycoris")
+lora_exists = False
+lycoris_exists = False
+
+try:
+    lora = import_module("lora")
+    lora_exists = True
+except ModuleNotFoundError:
+    print("The Lora extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+
+try:
+    lycoris = import_module("lycoris")
+    lycoris_exists = True
+except ModuleNotFoundError:
+    print("The LyCORIS extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
 
 
 def parse_filename(path):
@@ -233,4 +245,13 @@ def register_loras(descriptions_path):
 
 def register_lycos(descriptions_path):
     ui_extra_networks.register_page(LyCORISPage(descriptions_path))
+
+
+def register_all(description_paths):
+    embedding_path, hypernetwork_path, checkpoint_path, lora_path, lycos_path = description_paths
+    register_embeddings(embedding_path)
+    register_hypernetworks(hypernetwork_path)
+    register_checkpoints(checkpoint_path)
+    if lora_exists: register_loras(lora_path)
+    if lycoris_exists: register_lycos(lycos_path)
 
