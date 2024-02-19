@@ -1,32 +1,16 @@
 import os
 import json
 import html
-import sys
-from importlib import import_module
 
-from modules import ui_extra_networks, sd_hijack, shared, sd_models
+from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_networks
 from modules.textual_inversion.textual_inversion import Embedding
 
+from scripts.helpers.utils import import_lora_lycoris
 
-non_std_module_paths = ['../../../../extensions-builtin/Lora', '../../../../extensions-builtin/a1111-sd-webui-lycoris']
-for module_path in non_std_module_paths:
-    if module_path not in sys.path:
-        sys.path.append(module_path)
 
-lora_exists = False
-lycoris_exists = False
-
-try:
-    lora = import_module("lora")
-    lora_exists = True
-except ModuleNotFoundError:
-    print("The Lora extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
-
-try:
-    lycoris = import_module("lycoris")
-    lycoris_exists = True
-except ModuleNotFoundError:
-    print("The LyCORIS extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+lora, extra_networks_lora, lycoris = import_lora_lycoris()
+lora_exists = lora is not None
+lycoris_exists = lycoris is not None
 
 
 def parse_filename(path):
@@ -271,6 +255,8 @@ def register_all(description_paths):
     register_embeddings(embedding_path)
     register_hypernetworks(hypernetwork_path)
     register_checkpoints(checkpoint_path)
-    if lora_exists: register_loras(lora_path)
+    if lora_exists:
+        register_loras(lora_path)
+        extra_networks.register_extra_network(extra_networks_lora.ExtraNetworkLora())
     if lycoris_exists: register_lycos(lycos_path)
 

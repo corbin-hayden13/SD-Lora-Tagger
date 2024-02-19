@@ -3,10 +3,13 @@ import shutil
 
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
+from modules import extra_networks
+from modules.script_callbacks import callback_map
+
 from modules.ui_extra_networks import extra_pages
 import gradio as gr
 
-from scripts.helpers.utils import init_extra_network_tags, load_tags
+from scripts.helpers.utils import init_extra_network_tags, decorate_as_listlike
 from scripts.helpers.registration_override import register_all
 
 """
@@ -22,10 +25,8 @@ config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
 models_dir = './models'
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
-
-
-def input_changed(*args):
-    print(f"SD Lora Tagger: {args}")
+# This prevents the on_before_ui() callback call for the Lora script
+decorate_as_listlike(callback_map, key="callbacks_before_ui", exclude_scripts=["lora_script.py"])
 
 
 def register_pages():
@@ -63,14 +64,6 @@ class LoraTagger(scripts.Script):
         try:
             if kwargs["elem_id"] == "txt2img_prompt":
                 pos_prompt_comp = component
-
-            """ if kwargs["elem_id"] == "txt2img_extra_search":
-                with gr.Row() as new_layout:
-                    tag_search_dropdown = gr.Dropdown(info="Search by tags...", multiselect=True,
-                                                      show_label=False, choices=list(load_tags(os.path.join(lora_tagger_dir, "network_descriptions/")).keys()))
-                    tag_search_dropdown.input(fn=input_changed, inputs=tag_search_dropdown)
-                    name_search = component
-                return new_layout """
 
         except KeyError:
             pass

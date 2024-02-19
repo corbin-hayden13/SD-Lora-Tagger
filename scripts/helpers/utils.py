@@ -1,5 +1,46 @@
 import os
 from glob import glob
+import sys
+from importlib import import_module
+
+
+def import_lora_lycoris():
+    lora = None
+    extra_networks_lora = None
+    lycoris = None
+
+    non_std_module_paths = ['../../../../extensions-builtin/Lora',
+                            '../../../../extensions-builtin/a1111-sd-webui-lycoris']
+    for module_path in non_std_module_paths:
+        if module_path not in sys.path:
+            sys.path.append(module_path)
+
+    try:
+        lora = import_module("lora")
+        extra_networks_lora = import_module("extra_networks_lora")
+    except ModuleNotFoundError:
+        print("The Lora extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+
+    try:
+        lycoris = import_module("lycoris")
+    except ModuleNotFoundError:
+        print("The LyCORIS extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+
+    return lora, extra_networks_lora, lycoris
+
+
+lora, extra_networks_lora, lycoris = import_lora_lycoris()
+
+
+class FilteredList(list):
+    def __init__(self, *args, exclude_scripts=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.exclude_scripts = exclude_scripts
+
+    def append(self, item):
+        if os.path.basename(item.script) not in self.exclude_scripts:
+            super().append(item)
+            print(f"SD Lora Tagger: Appending {item.script}")
 
 
 def init_extra_network_tags(models_path, descriptions_path, included_networks=None):
@@ -41,6 +82,12 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
 
                 with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w") as f:
                     f.write(file)
+
+
+def decorate_as_listlike(object, key="", exclude_scripts=["lora_script.py"]):
+    filtered_list = FilteredList(exclude_scripts=exclude_scripts)
+    filtered_list.extend(object[key])
+    object[key] = filtered_list
 
 
 def load_tags(descriptions_path):
