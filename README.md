@@ -8,4 +8,4 @@ This extension allows searching extra netwroks by tag files that can be created 
  - __TODO__; Edit Tag Files Through the webui:
 
 This extension is built to work with the major distributions of the `AUTOMATIC1111/stable-diffusion-webui` including the popular `vladmandic/automatic` fork.
- - If the extension is bugged on your specific fork of the `AUTOMATIC1111/stable-diffusion-webui`, please create an issue and I will try to address the issue as soon as possible
+ - If the extension is bugged on your specific fork of the `AUTOMATIC1111/stable-diffusion-webui`, please create an issue and I will try to address it as soon as possible
