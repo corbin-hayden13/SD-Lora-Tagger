@@ -9,7 +9,7 @@ from modules.script_callbacks import callback_map
 from modules.ui_extra_networks import extra_pages
 import gradio as gr
 
-from scripts.helpers.utils import init_extra_network_tags, decorate_as_listlike
+from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
 
 """
@@ -23,10 +23,9 @@ txt2img_extras_refresh_comp = None
 lora_tagger_dir = scripts.basedir()
 config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
 models_dir = './models'
+override_before_ui = ["lora_script.py", "lycoris_script.py"]
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
-# This prevents the on_before_ui() callback call for the Lora script
-decorate_as_listlike(callback_map, key="callbacks_before_ui", exclude_scripts=["lora_script.py"])
 
 
 def register_pages():
@@ -69,4 +68,7 @@ class LoraTagger(scripts.Script):
             pass
 
 
+# Stops Lora, LyCORIS from rendering their own extra_network pages alongside the custom ones
+callback_map["callbacks_before_ui"] = [item for item in callback_map["callbacks_before_ui"]
+                                       if os.path.basename(item.script) not in override_before_ui]
 script_callbacks.on_before_ui(register_pages)
