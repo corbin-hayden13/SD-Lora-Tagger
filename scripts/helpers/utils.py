@@ -6,6 +6,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
     """
     This is used in conjunction with the refresh feature for extra networks to update tag files for each network
     :param models_path:
+    :param descriptions_path:
     :param included_networks: A dictionary of str: list as "network_folder_name": ["desired","file", "extensions"].  If not None, will extend existing known file extensions with provided ones
     :return: None
     """
@@ -33,6 +34,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
         files = [file.split(".")[0] for file in os.listdir(path) if file.split(".")[-1] in networks[network]]
 
         for file in files:
+            print(f"SD Lora Tagger: {file} exists = {os.path.exists(os.path.join(descriptions_path, f'{network}/{file}.txt'))}")
             if not os.path.exists(os.path.join(descriptions_path, f"{network}/{file}.txt")):
                 if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
                     os.mkdir(os.path.join(descriptions_path, f"{network}/"))

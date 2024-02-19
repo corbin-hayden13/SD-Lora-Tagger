@@ -19,7 +19,7 @@ TODO: Can search by something called "search_terms"; Defined as the absolute fil
 txt2img_extras_refresh_comp = None
 lora_tagger_dir = scripts.basedir()
 config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
-models_dir = f'./{lora_tagger_dir}/../../models/'
+models_dir = './models'
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 
@@ -58,7 +58,7 @@ class LoraTagger(scripts.Script):
             if kwargs["elem_id"] == "txt2img_extra_refresh":
                 txt2img_extras_refresh_comp = component
                 txt2img_extras_refresh_comp.click(lambda: print(f"SD Lora Tagger: Hello from the script!"
-                                                                f"\n{os.listdir(f'./{lora_tagger_dir}/../../models/Lora/')}"))
+                                                                f"\n{os.listdir(f'./models/Lora/')}"))
 
         except KeyError:
             pass
