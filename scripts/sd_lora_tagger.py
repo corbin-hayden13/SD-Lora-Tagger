@@ -13,9 +13,7 @@ from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
 
 """
-TODO: Setting to switch between AUTOMATIC1111/stable-diffusion-webui and vladmandic/automatic (SD.Next)
-TODO: Can search by something called "search_terms"; Defined as the absolute file path of all extra networks currently
-  - Register extra network pages to add custom search_terms
+TODO: Change search box from textbox to dropdown to allow for much easier tag searching
 """
 
 
@@ -69,6 +67,7 @@ class LoraTagger(scripts.Script):
 
 
 # Stops Lora, LyCORIS from rendering their own extra_network pages alongside the custom ones
+#   by removing their on_before_ui() callback functions before they're called
 callback_map["callbacks_before_ui"] = [item for item in callback_map["callbacks_before_ui"]
                                        if os.path.basename(item.script) not in override_before_ui]
 script_callbacks.on_before_ui(register_pages)
