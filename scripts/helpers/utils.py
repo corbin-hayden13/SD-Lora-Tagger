@@ -2,6 +2,7 @@ import os
 from glob import glob
 import sys
 from importlib import import_module
+from modules import paths_internal
 
 
 def import_lora_lycoris():
@@ -9,8 +10,9 @@ def import_lora_lycoris():
     extra_networks_lora = None
     lycoris = None
 
-    non_std_module_paths = ['../../../../extensions-builtin/Lora',
-                            '../../../../extensions-builtin/a1111-sd-webui-lycoris']
+    # Paths used from modules/paths_internal.py
+    non_std_module_paths = [f'{os.path.join(paths_internal.extensions_builtin_dir, "Lora")}',
+                            f'{os.path.join(paths_internal.extensions_builtin_dir, "a1111-sd-webui-lycoris")}'] # Not included in A1111
     for module_path in non_std_module_paths:
         if module_path not in sys.path:
             sys.path.append(module_path)

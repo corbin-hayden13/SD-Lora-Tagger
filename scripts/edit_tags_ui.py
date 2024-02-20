@@ -19,7 +19,7 @@ def populate_all_tags():
     for file in all_txt_files:
         file_name = os.path.basename(file).split(".")[0]
 
-        with open(file, "r") as f:
+        with open(file, "r", encoding='utf-8') as f:
             file_data = f.read()
             for tag in file_data.split(","):
                 try:
@@ -32,7 +32,7 @@ def save_text(*args):
     file_path = args[0]["label"]
     tags = args[1]
 
-    with open(file_path, "w") as f:
+    with open(file_path, "w", encoding='utf-8') as f:
         f.write(tags)
 
     populate_all_tags()
@@ -79,7 +79,7 @@ def on_ui_tabs():
             for txt_file in all_txt_files:
                 file_name = os.path.basename(txt_file).split(".")[0]
 
-                with open(txt_file, "r") as f:
+                with open(txt_file, "r", encoding='utf-8') as f:
                     file_data = f.read()
 
                 with gr.Row(elem_id=f"{file_name}_row_container") as new_file_row:
