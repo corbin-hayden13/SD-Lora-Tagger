@@ -42,13 +42,25 @@ function setupExtraNetworksForTab(tabname) {
             var searchOnly = elem.querySelector('.search_only');
             var text = elem.querySelector('.name').textContent.toLowerCase() + " " + elem.querySelector('.search_term').textContent.toLowerCase();
 
+            const searchTerms = searchTerm.replace(" ", ",").replace(/\s/g, "").split(",");
+            let setInvsible = false;
+            for (let a = 0; a < searchTerms.length; a++) {
+                if (text.indexOf(searchTerms[a]) === -1) {
+                    setInvsible = true;
+                    break;
+                }
+            }
+
+            /* Original Logic
+            elem.style.display = setInvsible ? 'none' : '';
+
             var visible = text.indexOf(searchTerm) != -1;
 
             if (searchOnly && searchTerm.length < 4) {
                 visible = false;
             }
 
-            elem.style.display = visible ? "" : "none";
+            elem.style.display = visible ? "" : "none"; */
         });
 
         applySort();
@@ -154,9 +166,15 @@ function applyExtraNetworkSort(tabname) {
     setTimeout(extraNetworksApplySort[tabname], 1);
 }
 
-var extraNetworksApplyFilter = {};
-var extraNetworksApplySort = {};
-var activePromptTextarea = {};
+if (typeof extraNetworksApplyFilter === "undefined") {
+    var extraNetworksApplyFilter = {};
+}
+if (typeof extraNetworksApplySort === "undefined") {
+    var extraNetworksApplySort = {};
+}
+if (typeof activePromptTextarea === "undefined") {
+    var activePromptTextarea = {};
+}
 
 function setupExtraNetworks() {
     setupExtraNetworksForTab('txt2img');
@@ -182,8 +200,12 @@ function setupExtraNetworks() {
 
 onUiLoaded(setupExtraNetworks);
 
-var re_extranet = /<([^:^>]+:[^:]+):[\d.]+>(.*)/;
-var re_extranet_g = /<([^:^>]+:[^:]+):[\d.]+>/g;
+if (typeof re_extranet === "undefined") {
+    var re_extranet = /<([^:^>]+:[^:]+):[\d.]+>(.*)/;
+}
+if (typeof re_extranet_g === "undefined") {
+    var re_extranet_g = /<([^:^>]+:[^:]+):[\d.]+>/g;
+}
 
 function tryToRemoveExtraNetworkFromPrompt(textarea, text) {
     var m = text.match(re_extranet);
