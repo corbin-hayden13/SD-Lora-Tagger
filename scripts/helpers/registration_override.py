@@ -1,6 +1,7 @@
 import os
 import json
 import html
+from pathlib import Path
 
 from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_networks
 from modules.textual_inversion.textual_inversion import Embedding
@@ -16,6 +17,23 @@ lycoris_exists = lycoris is not None
 def parse_filename(path):
     edited_filename = path.replace("\\", "/")
     return edited_filename.split("/")[-1]
+
+def get_or_create_tags_file(base_path, filename):
+    try:
+        with open(os.path.join(base_path,
+                                f"{parse_filename(filename).split('.')[0]}.txt"), "r") as f:
+            search_terms = f.read()
+        return search_terms
+    except FileNotFoundError:
+        path = os.path.join(base_path, f"{parse_filename(filename).split('.')[0]}.txt")
+        if not os.path.isdir(base_path): 
+            Path(base_path).mkdir(parents=True) # All directiories might not exist
+
+        print(f'path: {path}')
+        with open(path, "w") as f:
+            search_terms = parse_filename(filename).split('.')[0]
+            f.write(search_terms)
+        return search_terms
 
 
 class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
@@ -43,15 +61,8 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                         embeddings.append(embedding)
         for embedding in embeddings:
             path, _ext = os.path.splitext(embedding.filename)
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(embedding.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(embedding.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(embedding.filename).split('.')[0]
-                    f.write(search_terms)
+
+            search_terms = get_or_create_tags_file(self.descriptions_path, embedding.filename)
 
             yield {
                 "name": os.path.splitext(embedding.name)[0],
@@ -81,14 +92,7 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
         for name, path in shared.hypernetworks.items():
             path, _ext = os.path.splitext(path)
 
-            try:
-                with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(path).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, path)
 
             yield {
                 "name": name,
@@ -122,16 +126,7 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
         for name, checkpoint in sd_models.checkpoints_list.items():
             path, _ext = os.path.splitext(checkpoint.filename)
 
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(checkpoint.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(checkpoint.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(checkpoint.filename).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, checkpoint.filename)
 
             yield {
                 "name": checkpoint.name_for_extra,
@@ -183,16 +178,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 tags[' '.join(words[1:])] = words[0]
             # shared.log.debug(f'Lora: {path}: name={name} alias={alias} tags={tags}')
 
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(lora_on_disk.filename).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, lora_on_disk.filename)
 
             yield {
                 "name": name,
@@ -231,16 +217,7 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
             path, ext = os.path.splitext(lyco_on_disk.filename)
             sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
 
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(lyco_on_disk.filename).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, lyco_on_disk.filename)
 
             yield {
                 "name": name,
