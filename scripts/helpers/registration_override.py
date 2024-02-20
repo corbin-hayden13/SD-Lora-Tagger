@@ -5,17 +5,12 @@ import html
 from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_networks
 from modules.textual_inversion.textual_inversion import Embedding
 
-from scripts.helpers.utils import import_lora_lycoris
+from scripts.helpers.utils import lora, lycoris, extra_networks_lora, get_or_create_tags_file
+from scripts.globals import update_hide_nsfw
 
 
-lora, extra_networks_lora, lycoris = import_lora_lycoris()
 lora_exists = lora is not None
 lycoris_exists = lycoris is not None
-
-
-def parse_filename(path):
-    edited_filename = path.replace("\\", "/")
-    return edited_filename.split("/")[-1]
 
 
 class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
@@ -26,9 +21,11 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
         self.extras = extras
 
     def refresh(self):
+        self.extras = update_hide_nsfw(self.extras)
         sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings(force_reload=True)
 
     def list_items(self):
+        self.extras = update_hide_nsfw(self.extras)
         embeddings = list(sd_hijack.model_hijack.embedding_db.word_embeddings.values())
         if len(embeddings) == 0: # maybe not loaded yet, so lets just look them up
             try:
@@ -44,15 +41,8 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                         embeddings.append(embedding)
         for embedding in embeddings:
             path, _ext = os.path.splitext(embedding.filename)
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(embedding.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(embedding.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(embedding.filename).split('.')[0]
-                    f.write(search_terms)
+
+            search_terms = get_or_create_tags_file(self.descriptions_path, embedding.filename)
 
             yield_dict = {
                 "name": os.path.splitext(embedding.name)[0],
@@ -79,20 +69,15 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
         self.extras = extras
 
     def refresh(self):
+        self.extras = update_hide_nsfw(self.extras)
         shared.reload_hypernetworks()
 
     def list_items(self):
+        self.extras = update_hide_nsfw(self.extras)
         for name, path in shared.hypernetworks.items():
             path, _ext = os.path.splitext(path)
 
-            try:
-                with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(path).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, path)
 
             yield_dict = {
                 "name": name,
@@ -122,23 +107,16 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
         self.extras = extras
 
     def refresh(self):
+        self.extras = update_hide_nsfw(self.extras)
         shared.refresh_checkpoints()
 
     def list_items(self):
         checkpoint: sd_models.CheckpointInfo
+        self.extras = update_hide_nsfw(self.extras)
         for name, checkpoint in sd_models.checkpoints_list.items():
             path, _ext = os.path.splitext(checkpoint.filename)
 
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(checkpoint.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(checkpoint.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(checkpoint.filename).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, checkpoint.filename)
 
             yield_dict = {
                 "name": checkpoint.name_for_extra,
@@ -173,9 +151,11 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
         self.extras = extras
 
     def refresh(self):
+        self.extras = update_hide_nsfw(self.extras)
         lora.list_available_loras()
 
     def list_items(self):
+        self.extras = update_hide_nsfw(self.extras)
         for name, lora_on_disk in lora.available_loras.items():
             path, _ext = os.path.splitext(lora_on_disk.filename)
             alias = lora_on_disk.get_alias()
@@ -193,16 +173,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 tags[' '.join(words[1:])] = words[0]
             # shared.log.debug(f'Lora: {path}: name={name} alias={alias} tags={tags}')
 
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(lora_on_disk.filename).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, lora_on_disk.filename)
 
             yield_dict = {
                 "name": name,
@@ -237,23 +208,16 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
         self.extras = extras
 
     def refresh(self):
+        self.extras = update_hide_nsfw(self.extras)
         lycoris.list_available_lycos(self.model_dir)
 
     def list_items(self):
+        self.extras = update_hide_nsfw(self.extras)
         for index, (name, lyco_on_disk) in enumerate(lycoris.available_lycos.items()):
             path, ext = os.path.splitext(lyco_on_disk.filename)
             sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
 
-            try:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt"), "r") as f:
-                    search_terms = f.read()
-
-            except FileNotFoundError:
-                with open(os.path.join(self.descriptions_path,
-                                       f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt"), "w") as f:
-                    search_terms = parse_filename(lyco_on_disk.filename).split('.')[0]
-                    f.write(search_terms)
+            search_terms = get_or_create_tags_file(self.descriptions_path, lyco_on_disk.filename)
 
             yield_dict = {
                 "name": name,

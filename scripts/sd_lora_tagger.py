@@ -7,15 +7,14 @@ from modules.scripts import script_callbacks
 from modules.script_callbacks import callback_map
 from modules.cmd_args import parser
 from modules.ui_extra_networks import extra_pages
-import modules.shared as shared
 
 from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
 from scripts.edit_tags_ui import on_ui_tabs, on_ui_settings, populate_all_tags
+from scripts.globals import hide_nsfw
 
 
 txt2img_extras_refresh_comp = None
-hide_nsfw_networks_key = "sd_lora_tagger_hide_nsfw_extra_networks"
 lora_tagger_dir = scripts.basedir()
 config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
 models_dir = './models'
@@ -48,11 +47,6 @@ def register_pages():
                          os.path.join(lora_tagger_dir, "network_descriptions/Stable-diffusion/"),
                          os.path.join(lora_tagger_dir, "network_descriptions/Lora/"),
                          os.path.join(lora_tagger_dir, "network_descriptions/LyCORIS/"))
-
-    try:
-        hide_nsfw = shared.opts.data[hide_nsfw_networks_key]
-    except KeyError:
-        hide_nsfw = False
 
     item_decorator_dict = {
         "hide_nsfw": "true" if hide_nsfw else "false",
