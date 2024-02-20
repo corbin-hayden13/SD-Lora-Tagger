@@ -6,6 +6,8 @@ This extension allows searching extra netwroks by tag files that can be created 
  - __Search by Tags__:  Using the regular checkpoint/embedding/lora/etc. search bar, search for your extra networks using custom tags (the default tags are the extra network file names).
  - __Refresh Tags__:  Using the regular extra network refresh button, register new tags with the webui and search like normal without having to restart your server.
  - __Edit Tag Files Through webui__:  Through the SD Lora Tagger tab, you can search for all of the tag files of your extra networks, edit the tag files, and save the current state of the tags you edit.
+ - __TODO__: NSFW Tag Filtering:  By adding the `nsfw` tag to an extra network's tag file, you can then check the option to hide nsfw tags within the settings tab for SD-Lora-Tagger and all extra networks tagged as `nsfw` will automatically be hidden.
+   - After checking the settings box, click `apply settings` then reload the server to make sure the nsfw filter fully takes effect.
 
 This extension is built to work with the major distributions of the `AUTOMATIC1111/stable-diffusion-webui` including the popular `vladmandic/automatic` fork.
  - If the extension is bugged on your specific fork of the `AUTOMATIC1111/stable-diffusion-webui`, please create an issue and I will try to address it as soon as possible
