@@ -57,6 +57,11 @@ function setupExtraNetworksForTab(tabname) {
     const searchTerm = search.value.toLowerCase();
     gradioApp().querySelectorAll(`#${tabname}_extra_tabs div.card`).forEach((elem) => {
       let text = `${elem.querySelector('.name').textContent.toLowerCase()} ${elem.querySelector('.search_term').textContent.toLowerCase()}`;
+      let nsfw_override = `${elem.querySelector('.hide_nsfw').textContent.toLowerCase()}` === "true" ? true : false;
+      if (text.indexOf("nsfw") !== -1 && nsfw_override) {
+        elem.style.display = "none";
+        return;
+      }
       text = text.replace('models--', 'Diffusers');
       // reference from https://stackoverflow.com/questions/6623231/remove-all-white-spaces-from-text
       const searchTerms = searchTerm.replace(" ", ",").replace(/\s/g, "").split(",");

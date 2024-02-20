@@ -3,6 +3,7 @@ import glob
 import gradio as gr
 
 import modules.scripts as scripts
+import modules.shared as shared
 
 
 global all_tags, all_txt_files
@@ -99,4 +100,10 @@ def on_ui_tabs():
         search_bar.input(fn=search_extra_networks, inputs=file_rows, outputs=file_rows)
 
     return [(sd_lora_tagger, "SD Lora Tagger", "sd_lora_tagger")]
+
+
+def on_ui_settings():
+    section = ("sd_lora_tagger", "SD Lora Tagger")
+    shared.opts.add_option("sd_lora_tagger_hide_nsfw_extra_networks",
+                           shared.OptionInfo(False, "Show Civitai Link events in the console", section=section))
 

@@ -19,10 +19,11 @@ def parse_filename(path):
 
 
 class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
-    def __init__(self, descriptions_path):
+    def __init__(self, descriptions_path, extras=None):
         super().__init__('Textual Inversion')
         self.allow_negative_prompt = True
         self.descriptions_path = descriptions_path
+        self.extras = extras
 
     def refresh(self):
         sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings(force_reload=True)
@@ -53,7 +54,7 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                     search_terms = parse_filename(embedding.filename).split('.')[0]
                     f.write(search_terms)
 
-            yield {
+            yield_dict = {
                 "name": os.path.splitext(embedding.name)[0],
                 "filename": embedding.filename,
                 "preview": self.find_preview(path),
@@ -63,6 +64,12 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
 
+            if self.extras is not None:
+                for key, value in self.extras.items():
+                    yield_dict[key] = value
+
+            yield yield_dict
+
     def allowed_directories_for_previews(self):
         default = list(sd_hijack.model_hijack.embedding_db.embedding_dirs)
         default.append(self.descriptions_path)
@@ -70,9 +77,10 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
 
 
 class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
-    def __init__(self, descriptions_path):
+    def __init__(self, descriptions_path, extras=None):
         super().__init__('Hypernetworks')
         self.descriptions_path = descriptions_path
+        self.extras = extras
 
     def refresh(self):
         shared.reload_hypernetworks()
@@ -90,7 +98,7 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
                     search_terms = parse_filename(path).split('.')[0]
                     f.write(search_terms)
 
-            yield {
+            yield_dict = {
                 "name": name,
                 "filename": path,
                 "preview": self.find_preview(path),
@@ -99,6 +107,12 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
                 "prompt": json.dumps(f"<hypernet:{name}:{shared.opts.extra_networks_default_multiplier}>"),
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
+
+            if self.extras is not None:
+                for key, value in self.extras.items():
+                    yield_dict[key] = value
+
+            yield yield_dict
 
     def allowed_directories_for_previews(self):
         try:
@@ -110,9 +124,10 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
 
 
 class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
-    def __init__(self, descriptions_path):
+    def __init__(self, descriptions_path, extras=None):
         super().__init__('Checkpoints')
         self.descriptions_path = descriptions_path
+        self.extras = extras
 
     def refresh(self):
         shared.refresh_checkpoints()
@@ -133,7 +148,7 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
                     search_terms = parse_filename(checkpoint.filename).split('.')[0]
                     f.write(search_terms)
 
-            yield {
+            yield_dict = {
                 "name": checkpoint.name_for_extra,
                 "filename": path,
                 "fullname": checkpoint.filename,
@@ -145,6 +160,12 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
                 "local_preview": f"{path}.{shared.opts.samples_format}",
                 "metadata": checkpoint.metadata,
             }
+
+            if self.extras is not None:
+                for key, value in self.extras.items():
+                    yield_dict[key] = value
+
+            yield yield_dict
 
     def allowed_directories_for_previews(self):
         try:
@@ -158,9 +179,10 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
 
 
 class LoraPage(ui_extra_networks.ExtraNetworksPage):
-    def __init__(self, descriptions_path):
+    def __init__(self, descriptions_path, extras=None):
         super().__init__('Lora')
         self.descriptions_path = descriptions_path
+        self.extras = extras
 
     def refresh(self):
         lora.list_available_loras()
@@ -194,7 +216,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                     search_terms = parse_filename(lora_on_disk.filename).split('.')[0]
                     f.write(search_terms)
 
-            yield {
+            yield_dict = {
                 "name": name,
                 "filename": path,
                 "fullname": lora_on_disk.filename,
@@ -208,12 +230,18 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 "tags": tags,
             }
 
+            if self.extras is not None:
+                for key, value in self.extras.items():
+                    yield_dict[key] = value
+
+            yield yield_dict
+
     def allowed_directories_for_previews(self):
         return [shared.cmd_opts.lora_dir]
 
 
 class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
-    def __init__(self, descriptions_path, base_name='lyco', model_dir=None):
+    def __init__(self, descriptions_path, base_name='lyco', model_dir=None, extras=None):
         super().__init__('LyCORIS')
         # If LyCORIS is not installed, cannot pre-compute shared.cmd_opts.lyco_dir so it cannot be a default arg
         if model_dir is None:
@@ -222,6 +250,7 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
             self.model_dir = model_dir
         self.descriptions_path = descriptions_path
         self.base_name = base_name
+        self.extras = extras
 
     def refresh(self):
         lycoris.list_available_lycos(self.model_dir)
@@ -242,7 +271,7 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
                     search_terms = parse_filename(lyco_on_disk.filename).split('.')[0]
                     f.write(search_terms)
 
-            yield {
+            yield_dict = {
                 "name": name,
                 "filename": path,
                 "preview": self.find_preview(path),
@@ -258,37 +287,44 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
                 "sort_keys": {'default': index, **sort_keys},
             }
 
+            if self.extras is not None:
+                for key, value in self.extras.items():
+                    yield_dict[key] = value
+
+            yield yield_dict
+
     def allowed_directories_for_previews(self):
         return [self.model_dir]
 
 
-def register_embeddings(descriptions_path):
-    ui_extra_networks.register_page(EmbeddingsPage(descriptions_path))
+def register_embeddings(descriptions_path, extras: dict):
+    ui_extra_networks.register_page(EmbeddingsPage(descriptions_path, extras=extras))
 
 
-def register_hypernetworks(descriptions_path):
-    ui_extra_networks.register_page(HypernetworksPage(descriptions_path))
+def register_hypernetworks(descriptions_path, extras: dict):
+    ui_extra_networks.register_page(HypernetworksPage(descriptions_path, extras=extras))
 
 
-def register_checkpoints(descriptions_path):
-    ui_extra_networks.register_page(CheckpointsPage(descriptions_path))
+def register_checkpoints(descriptions_path, extras: dict):
+    ui_extra_networks.register_page(CheckpointsPage(descriptions_path, extras=extras))
 
 
-def register_loras(descriptions_path):
-    ui_extra_networks.register_page(LoraPage(descriptions_path))
+def register_loras(descriptions_path, extras: dict):
+    ui_extra_networks.register_page(LoraPage(descriptions_path, extras=extras))
 
 
-def register_lycos(descriptions_path):
-    ui_extra_networks.register_page(LyCORISPage(descriptions_path))
+def register_lycos(descriptions_path, extras: dict):
+    ui_extra_networks.register_page(LyCORISPage(descriptions_path, extras=extras))
 
 
-def register_all(description_paths):
+def register_all(description_paths, extras: dict):
     embedding_path, hypernetwork_path, checkpoint_path, lora_path, lycos_path = description_paths
-    register_embeddings(embedding_path)
-    register_hypernetworks(hypernetwork_path)
-    register_checkpoints(checkpoint_path)
+    register_embeddings(embedding_path, extras)
+    register_hypernetworks(hypernetwork_path, extras)
+    register_checkpoints(checkpoint_path, extras)
     if lora_exists:
-        register_loras(lora_path)
+        register_loras(lora_path, extras)
         extra_networks.register_extra_network(extra_networks_lora.ExtraNetworkLora())
-    if lycoris_exists: register_lycos(lycos_path)
+    if lycoris_exists:
+        register_lycos(lycos_path, extras)
 
