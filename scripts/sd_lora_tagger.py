@@ -25,12 +25,14 @@ destination_path = os.path.join(lora_tagger_dir, f"javascript/{js_overrides[0]}"
 source_path = os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[0]}") if using_sd_next\
          else os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[1]}")
 
-if not os.path.exists(destination_path):
-    try:
-        # Avoiding losing the file during transit, opting to copy instead of replacing the file
-        shutil.copy(source_path, destination_path)
-    except Exception as e:
-        print(f"SD Lora Tagger: using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
+try:
+    # Avoiding losing the file during transit, opting to copy instead of replacing the file
+    if os.path.exists(destination_path):
+        os.remove(destination_path)
+
+    shutil.copy(source_path, destination_path)
+except Exception as e:
+    print(f"SD Lora Tagger: using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 populate_all_tags()
