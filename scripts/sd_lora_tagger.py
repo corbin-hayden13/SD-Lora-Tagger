@@ -19,7 +19,17 @@ models_dir = './models'
 override_before_ui = ["lora_script.py", "lycoris_script.py", "ui_extra_networks.py"]
 
 using_sd_next = parser.description is not None and parser.description == "SD.Next"
-print(f"SD Lora Tagger: using_sd_next={using_sd_next}")
+js_overrides = ["sdNextExtraNetworks.js", "automatic1111ExtraNetworks.js"]
+destination_path = os.path.join(lora_tagger_dir, f"javascript/{js_overrides[0]}") if using_sd_next\
+              else os.path.join(lora_tagger_dir, f"javascript/{js_overrides[1]}")
+source_path = os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[0]}") if using_sd_next\
+         else os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[1]}")
+
+if not os.path.exists(destination_path):
+    try:
+        shutil.move(source_path, destination_path)
+    except Exception as e:
+        print(f"SD Lora Tagger: using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 populate_all_tags()
