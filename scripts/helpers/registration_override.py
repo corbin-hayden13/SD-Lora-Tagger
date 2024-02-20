@@ -21,7 +21,7 @@ def parse_filename(path):
 def get_or_create_tags_file(base_path, filename):
     path = os.path.join(base_path, f"{parse_filename(filename).split('.')[0]}.txt")
     try:
-        with open(path, 'r', encoding='utf8') as f:
+        with open(path, 'r', encoding='utf-8') as f:
             search_terms = f.read()
         return search_terms
     except FileNotFoundError:
