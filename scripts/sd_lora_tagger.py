@@ -1,16 +1,13 @@
 import os
-import shutil
 
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
-from modules import extra_networks
 from modules.script_callbacks import callback_map
-
 from modules.ui_extra_networks import extra_pages
-import gradio as gr
 
 from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
+from scripts.edit_tags_ui import on_ui_tabs, populate_all_tags
 
 """
 TODO: Change search box from textbox to dropdown to allow for much easier tag searching
@@ -24,6 +21,7 @@ models_dir = './models'
 override_before_ui = ["lora_script.py", "lycoris_script.py"]
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
+populate_all_tags()
 
 
 def register_pages():
@@ -50,8 +48,6 @@ class LoraTagger(scripts.Script):
         try:
             if kwargs["elem_id"] == "txt2img_extra_refresh":
                 txt2img_extras_refresh_comp = component
-                txt2img_extras_refresh_comp.click(lambda: print(f"SD Lora Tagger: Hello from the script!"
-                                                                f"\n{os.listdir(f'./models/Lora/')}"))
 
         except KeyError:
             pass
@@ -71,3 +67,4 @@ class LoraTagger(scripts.Script):
 callback_map["callbacks_before_ui"] = [item for item in callback_map["callbacks_before_ui"]
                                        if os.path.basename(item.script) not in override_before_ui]
 script_callbacks.on_before_ui(register_pages)
+script_callbacks.on_ui_tabs(on_ui_tabs)

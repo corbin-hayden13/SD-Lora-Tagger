@@ -32,17 +32,6 @@ def import_lora_lycoris():
 lora, extra_networks_lora, lycoris = import_lora_lycoris()
 
 
-class FilteredList(list):
-    def __init__(self, *args, exclude_scripts=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.exclude_scripts = exclude_scripts
-
-    def append(self, item):
-        if os.path.basename(item.script) not in self.exclude_scripts:
-            super().append(item)
-            print(f"SD Lora Tagger: Appending {item.script}")
-
-
 def init_extra_network_tags(models_path, descriptions_path, included_networks=None):
     """
     This is used in conjunction with the refresh feature for extra networks to update tag files for each network
@@ -75,19 +64,12 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
         files = [file.split(".")[0] for file in os.listdir(path) if file.split(".")[-1] in networks[network]]
 
         for file in files:
-            print(f"SD Lora Tagger: {file} exists = {os.path.exists(os.path.join(descriptions_path, f'{network}/{file}.txt'))}")
             if not os.path.exists(os.path.join(descriptions_path, f"{network}/{file}.txt")):
                 if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
                     os.mkdir(os.path.join(descriptions_path, f"{network}/"))
 
                 with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w") as f:
                     f.write(file)
-
-
-def decorate_as_listlike(object, key="", exclude_scripts=["lora_script.py"]):
-    filtered_list = FilteredList(exclude_scripts=exclude_scripts)
-    filtered_list.extend(object[key])
-    object[key] = filtered_list
 
 
 def load_tags(descriptions_path):
