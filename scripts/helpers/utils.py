@@ -2,7 +2,7 @@ import os
 from glob import glob
 import sys
 from importlib import import_module
-from modules import paths_internal
+from scripts.helpers.paths import extension_paths
 
 
 def import_lora_lycoris():
@@ -10,10 +10,7 @@ def import_lora_lycoris():
     extra_networks_lora = None
     lycoris = None
 
-    # Paths used from modules/paths_internal.py
-    non_std_module_paths = [f'{os.path.join(paths_internal.extensions_builtin_dir, "Lora")}',
-                            f'{os.path.join(paths_internal.extensions_builtin_dir, "a1111-sd-webui-lycoris")}'] # Not included in A1111
-    for module_path in non_std_module_paths:
+    for module_path in extension_paths:
         if module_path not in sys.path:
             sys.path.append(module_path)
 
@@ -74,7 +71,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                 if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
                     os.mkdir(os.path.join(descriptions_path, f"{network}/"))
 
-                with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w") as f:
+                with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w", encoding='utf8') as f:
                     f.write(file)
 
 
@@ -83,13 +80,14 @@ def load_tags(descriptions_path):
     all_tags = {}
 
     for file in files:
-        with open(file) as f:
+        with open(file, encoding='utf-8') as f:
+            file_name = os.path.basename(file).split(".")[0]
             tags = f.read().split(",")
 
             for tag in tags:
                 try:
-                    all_tags[tag].append(file)
+                    all_tags[tag].append(file.replace(f'{file_name}, ', ''))
                 except KeyError:
-                    all_tags[tag] = [file]
+                    all_tags[tag] = [file.replace(f'{file_name}, ', '')]
 
     return all_tags

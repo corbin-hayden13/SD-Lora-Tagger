@@ -1,29 +1,20 @@
 import os
 import shutil
+import scripts.ui_tag_editor
 
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
 from modules.script_callbacks import callback_map
-from modules.cmd_args import parser
 from modules.ui_extra_networks import extra_pages
 
 from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
-from scripts.edit_tags_ui import on_ui_tabs, populate_all_tags
-
+from scripts.edit_tags_ui import populate_all_tags
+from scripts.ui_tag_editor import on_ui_tabs
+from scripts.helpers.paths import destination_path, source_path, models_dir, using_sd_next, model_description_dirs, description_path
 
 txt2img_extras_refresh_comp = None
-lora_tagger_dir = scripts.basedir()
-config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
-models_dir = './models'
 override_before_ui = ["lora_script.py", "lycoris_script.py", "ui_extra_networks.py"]
-
-using_sd_next = parser.description is not None and parser.description == "SD.Next"
-js_overrides = ["sdNextExtraNetworks.js", "automatic1111ExtraNetworks.js"]
-destination_path = os.path.join(lora_tagger_dir, f"javascript/{js_overrides[0]}") if using_sd_next\
-              else os.path.join(lora_tagger_dir, f"javascript/{js_overrides[1]}")
-source_path = os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[0]}") if using_sd_next\
-         else os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[1]}")
 
 try:
     # Avoiding losing the file during transit, opting to copy instead of replacing the file
@@ -34,17 +25,17 @@ try:
 except Exception as e:
     print(f"SD Lora Tagger: using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
 
-init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
+init_extra_network_tags(models_dir, description_path)
 populate_all_tags()
 
 
 def register_pages():
     extra_pages.clear()
-    description_paths = (os.path.join(lora_tagger_dir, "network_descriptions/embeddings/"),
-                         os.path.join(lora_tagger_dir, "network_descriptions/hypernetworks/"),
-                         os.path.join(lora_tagger_dir, "network_descriptions/Stable-diffusion/"),
-                         os.path.join(lora_tagger_dir, "network_descriptions/Lora/"),
-                         os.path.join(lora_tagger_dir, "network_descriptions/LyCORIS/"))
+    description_paths = (model_description_dirs[0],
+                         model_description_dirs[1],
+                         model_description_dirs[2],
+                         model_description_dirs[3],
+                         model_description_dirs[4])
 
     register_all(description_paths)
 

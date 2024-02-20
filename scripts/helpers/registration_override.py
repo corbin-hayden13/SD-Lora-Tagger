@@ -28,7 +28,7 @@ def get_or_create_tags_file(base_path, filename):
             Path(base_path).mkdir(parents=True) # All directiories might not exist
 
         with open(path, 'w', encoding='utf-8') as f:
-            search_terms = parse_filename(filename).split('.')[0]
+            search_terms = parse_filename(filename).split('.')[0] + ', '
             f.write(search_terms)
         return search_terms
 
@@ -257,12 +257,13 @@ def register_lycos(descriptions_path):
 
 
 def register_all(description_paths):
-    embedding_path, hypernetwork_path, checkpoint_path, lora_path, lycos_path = description_paths
+    checkpoint_path, embedding_path, hypernetwork_path, lora_path, lycos_path = description_paths
+    register_checkpoints(checkpoint_path)
     register_embeddings(embedding_path)
     register_hypernetworks(hypernetwork_path)
-    register_checkpoints(checkpoint_path)
     if lora_exists:
         register_loras(lora_path)
         extra_networks.register_extra_network(extra_networks_lora.ExtraNetworkLora())
-    if lycoris_exists: register_lycos(lycos_path)
+    if lycoris_exists: 
+        register_lycos(lycos_path)
 
