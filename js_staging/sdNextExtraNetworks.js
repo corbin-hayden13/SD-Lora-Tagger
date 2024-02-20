@@ -1,8 +1,16 @@
-let globalPopup = null;
-let globalPopupInner = null;
-const activePromptTextarea = {};
+if (typeof globalPopup === "undefined") {
+    let globalPopup = null;
+}
+if (typeof globalPopupInner === "undefined") {
+    let globalPopupInner = null;
+}
+if (typeof activePromptTextarea === "undefined") {
+    const activePromptTextarea = {};
+}
 
-const getENActiveTab = () => gradioApp().getElementById('tab_txt2img').style.display === 'block' ? 'txt2img' : 'img2img';
+if (typeof getENActiveTab === "undefined") {
+    const getENActiveTab = () => gradioApp().getElementById('tab_txt2img').style.display === 'block' ? 'txt2img' : 'img2img';
+}
 
 function requestGet(url, data, handler, errorHandler) {
   const xhr = new XMLHttpRequest();
@@ -118,8 +126,12 @@ function setupExtraNetworks() {
 }
 
 onUiLoaded(setupExtraNetworks);
-const re_extranet = /<([^:]+:[^:]+):[\d\.]+>/;
-const re_extranet_g = /\s+<([^:]+:[^:]+):[\d\.]+>/g;
+if (typeof re_extranet === "undefined") {
+    const re_extranet = /<([^:]+:[^:]+):[\d\.]+>/;
+}
+if (typeof re_extranet_g === "undefined") {
+    const re_extranet_g = /\s+<([^:]+:[^:]+):[\d\.]+>/g;
+}
 
 function tryToRemoveExtraNetworkFromPrompt(textarea, text) {
   let m = text.match(re_extranet);
