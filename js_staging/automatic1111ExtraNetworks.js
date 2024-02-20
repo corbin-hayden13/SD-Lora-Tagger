@@ -35,9 +35,12 @@ function setupExtraNetworksForTab(tabname) {
     tabs.appendChild(refresh);
     tabs.appendChild(showDirsDiv);
 
+    let nsfw_override = JSON.parse(`${gradioApp().querySelectorAll(`#${tabname}_extra_tabs div.card`)[0]
+        .querySelector('.description').textContent.toLowerCase()}`.split("|||")[1])["hide_nsfw"] === "true";
+
     gradioApp().querySelectorAll(`#${tabname}_extra_tabs div.card`).forEach((elem) => {
-        let overrides = `${elem.querySelector('.description').textContent.toLowerCase()}`.split("|||")[1];
-        let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
+        // let overrides = `${elem.querySelector('.description').textContent.toLowerCase()}`.split("|||")[1];
+        // let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
         if (`${elem.querySelector('.search_term').textContent.toLowerCase()}`.indexOf("nsfw") > -1 && nsfw_override) {
             elem.style.display = "none";
             return;
@@ -51,8 +54,8 @@ function setupExtraNetworksForTab(tabname) {
             var searchOnly = elem.querySelector('.search_only');
             var text = elem.querySelector('.name').textContent.toLowerCase() + " " + elem.querySelector('.search_term').textContent.toLowerCase();
 
-            let overrides = `${elem.querySelector('.description').textContent.toLowerCase()}`.split("|||")[1];
-            let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
+            // let overrides = `${elem.querySelector('.description').textContent.toLowerCase()}`.split("|||")[1];
+            // let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
             if (text.indexOf("nsfw") > -1 && nsfw_override) {
                 elem.style.display = "none";
                 return;
