@@ -51,9 +51,9 @@ function setupExtraNetworksForTab(tabname) {
                 }
             }
 
-            /* Original Logic
             elem.style.display = setInvsible ? 'none' : '';
 
+            /* Original Logic
             var visible = text.indexOf(searchTerm) != -1;
 
             if (searchOnly && searchTerm.length < 4) {
