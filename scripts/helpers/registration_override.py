@@ -6,10 +6,9 @@ from pathlib import Path
 from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_networks
 from modules.textual_inversion.textual_inversion import Embedding
 
-from scripts.helpers.utils import import_lora_lycoris
+from scripts.helpers.utils import lora, extra_networks_lora, lycoris
 
 
-lora, extra_networks_lora, lycoris = import_lora_lycoris()
 lora_exists = lora is not None
 lycoris_exists = lycoris is not None
 
