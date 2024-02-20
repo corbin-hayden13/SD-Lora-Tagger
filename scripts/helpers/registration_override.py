@@ -43,8 +43,15 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                         embeddings.append(embedding)
         for embedding in embeddings:
             path, _ext = os.path.splitext(embedding.filename)
-            with open(os.path.join(self.descriptions_path, f"{parse_filename(embedding.filename).split('.')[0]}.txt")) as f:
-                search_terms = f.read()
+            try:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(embedding.filename).split('.')[0]}.txt"), "r") as f:
+                    search_terms = f.read()
+            except FileNotFoundError:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(embedding.filename).split('.')[0]}.txt"), "w") as f:
+                    search_terms = parse_filename(embedding.filename).split('.')[0]
+                    f.write(search_terms)
 
             yield {
                 "name": os.path.splitext(embedding.name)[0],
@@ -74,8 +81,14 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
         for name, path in shared.hypernetworks.items():
             path, _ext = os.path.splitext(path)
 
-            with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt")) as f:
-                search_terms = f.read()
+            try:
+                with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt"), "r") as f:
+                    search_terms = f.read()
+
+            except FileNotFoundError:
+                with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt"), "w") as f:
+                    search_terms = parse_filename(path).split('.')[0]
+                    f.write(search_terms)
 
             yield {
                 "name": name,
@@ -109,8 +122,16 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
         for name, checkpoint in sd_models.checkpoints_list.items():
             path, _ext = os.path.splitext(checkpoint.filename)
 
-            with open(os.path.join(self.descriptions_path, f"{parse_filename(checkpoint.filename).split('.')[0]}.txt")) as f:
-                search_terms = f.read()
+            try:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(checkpoint.filename).split('.')[0]}.txt"), "r") as f:
+                    search_terms = f.read()
+
+            except FileNotFoundError:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(checkpoint.filename).split('.')[0]}.txt"), "w") as f:
+                    search_terms = parse_filename(checkpoint.filename).split('.')[0]
+                    f.write(search_terms)
 
             yield {
                 "name": checkpoint.name_for_extra,
@@ -162,8 +183,16 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 tags[' '.join(words[1:])] = words[0]
             # shared.log.debug(f'Lora: {path}: name={name} alias={alias} tags={tags}')
 
-            with open(os.path.join(self.descriptions_path, f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt")) as f:
-                search_terms = f.read()
+            try:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt"), "r") as f:
+                    search_terms = f.read()
+
+            except FileNotFoundError:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt"), "w") as f:
+                    search_terms = parse_filename(lora_on_disk.filename).split('.')[0]
+                    f.write(search_terms)
 
             yield {
                 "name": name,
@@ -202,8 +231,16 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
             path, ext = os.path.splitext(lyco_on_disk.filename)
             sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
 
-            with open(os.path.join(self.descriptions_path, f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt")) as f:
-                search_terms = f.read()
+            try:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt"), "r") as f:
+                    search_terms = f.read()
+
+            except FileNotFoundError:
+                with open(os.path.join(self.descriptions_path,
+                                       f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt"), "w") as f:
+                    search_terms = parse_filename(lyco_on_disk.filename).split('.')[0]
+                    f.write(search_terms)
 
             yield {
                 "name": name,
