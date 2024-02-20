@@ -21,7 +21,7 @@ txt2img_extras_refresh_comp = None
 lora_tagger_dir = scripts.basedir()
 config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
 models_dir = './models'
-override_before_ui = ["lora_script.py", "lycoris_script.py"]
+override_before_ui = ["lora_script.py", "lycoris_script.py", "ui_extra_networks.py"]
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 
