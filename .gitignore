@@ -9,4 +9,8 @@
 !SD-Lora-Tagger/scripts/helpers/
 !SD-Lora-Tagger/scripts/helpers/*
 !SD-Lora-Tagger/scripts/network_descriptions/.gitkeep
+!SD-Lora-Tagger/javascript/
+!SD-Lora-Tagger/javascript/*
+!SD-Lora-Tagger/js_staging/
+!SD-Lora-Tagger/js_staging/*
 SD-Lora-Tagger/scripts/network_descriptions/*
