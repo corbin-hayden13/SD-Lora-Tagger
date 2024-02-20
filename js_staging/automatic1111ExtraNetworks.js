@@ -35,12 +35,28 @@ function setupExtraNetworksForTab(tabname) {
     tabs.appendChild(refresh);
     tabs.appendChild(showDirsDiv);
 
+    gradioApp().querySelectorAll(`#${tabname}_extra_tabs div.card`).forEach((elem) => {
+        let overrides = `${elem.querySelector('.description').textContent.toLowerCase()}`.split("|||")[1];
+        let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
+        if (`${elem.querySelector('.search_term').textContent.toLowerCase()}`.indexOf("nsfw") > -1 && nsfw_override) {
+            elem.style.display = "none";
+            return;
+        }
+    });
+
     var applyFilter = function() {
         var searchTerm = search.value.toLowerCase();
 
         gradioApp().querySelectorAll('#' + tabname + '_extra_tabs div.card').forEach(function(elem) {
             var searchOnly = elem.querySelector('.search_only');
             var text = elem.querySelector('.name').textContent.toLowerCase() + " " + elem.querySelector('.search_term').textContent.toLowerCase();
+
+            let overrides = `${elem.querySelector('.description').textContent.toLowerCase()}`.split("|||")[1];
+            let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
+            if (text.indexOf("nsfw") > -1 && nsfw_override) {
+                elem.style.display = "none";
+                return;
+            }
 
             const searchTerms = searchTerm.replace(" ", ",").replace(/\s/g, "").split(",");
             let setInvsible = false;
