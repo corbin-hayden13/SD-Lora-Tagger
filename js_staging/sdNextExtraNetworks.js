@@ -28,7 +28,7 @@ function requestGet(url, data, handler, errorHandler) {
 }
 
 function setupExtraNetworksForTab(tabname) {
-  console.log("SD.Next: Hello!")
+  console.log("SD Lora Tagger -> SD.Next: Hello!")
   gradioApp().querySelector(`#${tabname}_extra_tabs`).classList.add('extra-networks');
   const tabs = gradioApp().querySelector(`#${tabname}_extra_tabs > div`);
   const search = gradioApp().querySelector(`#${tabname}_extra_search textarea`);
@@ -50,7 +50,16 @@ function setupExtraNetworksForTab(tabname) {
     gradioApp().querySelectorAll(`#${tabname}_extra_tabs div.card`).forEach((elem) => {
       let text = `${elem.querySelector('.name').textContent.toLowerCase()} ${elem.querySelector('.search_term').textContent.toLowerCase()}`;
       text = text.replace('models--', 'Diffusers');
-      elem.style.display = text.indexOf(searchTerm) === -1 ? 'none' : '';
+      // reference from https://stackoverflow.com/questions/6623231/remove-all-white-spaces-from-text
+      const searchTerms = searchTerm.replace(" ", ",").replace(/\s/g, "").split(",");
+      let setInvsible = false;
+      for (let a = 0; a < searchTerms.length; a++) {
+        if (text.indexOf(searchTerms[a]) === -1) {
+            setInvsible = true;
+            break;
+        }
+      }
+      elem.style.display = setInvsible ? 'none' : '';
     });
   });
 

@@ -27,7 +27,8 @@ source_path = os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[0]}") if 
 
 if not os.path.exists(destination_path):
     try:
-        shutil.move(source_path, destination_path)
+        # Avoiding losing the file during transit, opting to copy instead of replacing the file
+        shutil.copy(source_path, destination_path)
     except Exception as e:
         print(f"SD Lora Tagger: using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
 
