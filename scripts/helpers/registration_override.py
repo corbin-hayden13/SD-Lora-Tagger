@@ -45,7 +45,6 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
             path, _ext = os.path.splitext(embedding.filename)
             with open(os.path.join(self.descriptions_path, f"{parse_filename(embedding.filename).split('.')[0]}.txt")) as f:
                 search_terms = f.read()
-                print(f"SD Lora Tagger: {search_terms}")
 
             yield {
                 "name": os.path.splitext(embedding.name)[0],
@@ -77,7 +76,6 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
 
             with open(os.path.join(self.descriptions_path, f"{parse_filename(path).split('.')[0]}.txt")) as f:
                 search_terms = f.read()
-                print(f"SD Lora Tagger: {search_terms}")
 
             yield {
                 "name": name,
@@ -113,7 +111,6 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
 
             with open(os.path.join(self.descriptions_path, f"{parse_filename(checkpoint.filename).split('.')[0]}.txt")) as f:
                 search_terms = f.read()
-                print(f"SD Lora Tagger: {search_terms}")
 
             yield {
                 "name": checkpoint.name_for_extra,
@@ -167,7 +164,6 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
 
             with open(os.path.join(self.descriptions_path, f"{parse_filename(lora_on_disk.filename).split('.')[0]}.txt")) as f:
                 search_terms = f.read()
-                print(f"SD Lora Tagger: {search_terms}")
 
             yield {
                 "name": name,
@@ -208,7 +204,6 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
 
             with open(os.path.join(self.descriptions_path, f"{parse_filename(lyco_on_disk.filename).split('.')[0]}.txt")) as f:
                 search_terms = f.read()
-                print(f"SD Lora Tagger: {search_terms}")
 
             yield {
                 "name": name,
