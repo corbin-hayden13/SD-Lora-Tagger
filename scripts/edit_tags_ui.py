@@ -91,7 +91,7 @@ def on_ui_tabs():
 
                     with gr.Column(scale=2):
                         save_btn = gr.Button(value="Save", elem_id=f"{file_name}_save_btn")
-                        save_btn.click(fn=save_text, inputs=[gr.Label(value=txt_file, visible=False), textbox, search_bar],
+                        save_btn.click(fn=save_text, inputs=[gr.Label(value=txt_file, visible=False), textbox],
                                        outputs=[search_bar])
 
                         file_rows.append(save_btn)
