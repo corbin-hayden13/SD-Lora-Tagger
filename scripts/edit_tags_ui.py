@@ -81,8 +81,7 @@ def on_ui_tabs():
                 with gr.Row(elem_id=f"{file_name}_row_container") as new_file_row:
                     with gr.Column(elem_id=f"{file_name}_textbox_col", scale=7):
                         # Adds file path to info for later reference when saving
-                        textbox = gr.Textbox(label=file_name, value=file_data,
-                                             info=txt_file, elem_id=f"{file_name}_textbox")
+                        textbox = gr.Textbox(label=file_name, value=file_data, elem_id=f"{file_name}_textbox")
 
                         file_rows.append(textbox)
 
