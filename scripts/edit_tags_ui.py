@@ -5,26 +5,86 @@ import gradio as gr
 import modules.scripts as scripts
 
 
+global all_tags, all_txt_files
+
+
+def populate_all_tags():
+    global all_tags, all_txt_files
+
+    txt_pattern = os.path.join(scripts.basedir(), "network_descriptions/**/*.txt")
+    print(f"SD Lora Tagger UI: txt_pattern={txt_pattern}")
+    all_txt_files = glob.glob(txt_pattern, recursive=True)
+    all_tags = {}
+
+    for file in all_txt_files:
+        file_name = os.path.basename(file).split(".")[0]
+
+        with open(file, "r") as f:
+            file_data = f.read()
+            for tag in file_data.split(","):
+                try:
+                    all_tags[tag].append(file_name)
+                except KeyError:
+                    all_tags[tag] = [file_name]
+
+
 def refresh_txt_files():
     pass
 
 
+def search_extra_networks(*args):
+    dropdown = args[0]
+    print(f"SD Lora Tagger UI: dropdown={dropdown}")
+    rows = args[1:]
+    # If nothing is in the dropdown / no tags are being searched
+    if len(dropdown) <= 0:
+        ret_list = [gr.Dropdown.update()]
+        for a in range(1, len(args), 2):
+            ret_list.append(gr.Textbox().update(visible=True))
+            ret_list.append(gr.Button().update(visible=True))
+
+        return ret_list
+
+    new_rows = [gr.Dropdown().update()]
+    for a in range(0, len(rows), 2):
+        for tag in dropdown:
+            if tag in rows[a]:
+                new_rows.append(gr.Textbox().update(visible=True))
+                new_rows.append(gr.Button().update(visible=True))
+
+            else:
+                new_rows.append(gr.Textbox().update(visible=False))
+                new_rows.append(gr.Button().update(visible=False))
+
+    return new_rows
+
+
 def on_ui_tabs():
-    txt_pattern = os.path.join(scripts.basedir(), "network_descriptions/**/*.txt")
-    all_txt_files = glob.glob(txt_pattern, recursive=True)
-
     with gr.Blocks() as sd_lora_tagger:
-        search_bar = gr.Dropdown(label="Search By File Name or Tags", multiselect=True)
+        search_bar = gr.Dropdown(label="Search By File Name or Tags", multiselect=True,
+                                 choices=list(all_tags.keys()))
         with gr.Column():
-            file_rows = []
-            for file in all_txt_files:
-                with gr.Row() as new_file_row:
-                    with open(file, "r") as f:
-                        textbox = gr.Textbox(value=f.read())
+            file_rows = [search_bar]
+            for txt_file in all_txt_files:
+                file_name = os.path.basename(txt_file).split(".")[0]
 
-                    save_btn = gr.Button(value="Save")
+                with open(txt_file, "r") as f:
+                    file_data = f.read()
 
-                file_rows.append(new_file_row)
+                with gr.Row(elem_id=f"{file_name}_row_container") as new_file_row:
+                    with gr.Column(elem_id=f"{file_name}_textbox_col", scale=7):
+                        # Adds file path to info for later reference when saving
+                        textbox = gr.Textbox(label=file_name, value=file_data,
+                                             info=txt_file, elem_id=f"{file_name}_textbox")
+
+                        file_rows.append(textbox)
+
+                    with gr.Column(scale=2):
+                        save_btn = gr.Button(value="Save", elem_id=f"{file_name}_save_btn")
+
+                        file_rows.append(save_btn)
+
+        search_bar.input(fn=search_extra_networks, inputs=file_rows, outputs=file_rows)
 
     return [(sd_lora_tagger, "SD Lora Tagger", "sd_lora_tagger")]
 
