@@ -58,15 +58,11 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                 "name": os.path.splitext(embedding.name)[0],
                 "filename": embedding.filename,
                 "preview": self.find_preview(path),
-                "description": self.find_description(path),
+                "description": f"{self.find_description(path)}|||{self.extras}",  # self.find_description(path),
                 "search_term": search_terms,  # self.search_terms_from_path(embedding.filename),
                 "prompt": json.dumps(os.path.splitext(embedding.name)[0]),
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
-
-            if self.extras is not None:
-                for key, value in self.extras.items():
-                    yield_dict[key] = value
 
             yield yield_dict
 
@@ -102,15 +98,11 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
                 "name": name,
                 "filename": path,
                 "preview": self.find_preview(path),
-                "description": self.find_description(path),
+                "description": f"{self.find_description(path)}|||{self.extras}",  # self.find_description(path),
                 "search_term": search_terms,  # self.search_terms_from_path(path),
                 "prompt": json.dumps(f"<hypernet:{name}:{shared.opts.extra_networks_default_multiplier}>"),
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
-
-            if self.extras is not None:
-                for key, value in self.extras.items():
-                    yield_dict[key] = value
 
             yield yield_dict
 
@@ -154,16 +146,12 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
                 "fullname": checkpoint.filename,
                 "hash": checkpoint.shorthash,
                 "preview": self.find_preview(path),
-                "description": self.find_description(path),
+                "description": f"{self.find_description(path)}|||{self.extras}",  # self.find_description(path),
                 "search_term": search_terms,  # f'{self.search_terms_from_path(checkpoint.filename)} {(checkpoint.sha256 or "")} /{checkpoint.type}/',
                 "onclick": '"' + html.escape(f"""return selectCheckpoint({json.dumps(name)})""") + '"',
                 "local_preview": f"{path}.{shared.opts.samples_format}",
                 "metadata": checkpoint.metadata,
             }
-
-            if self.extras is not None:
-                for key, value in self.extras.items():
-                    yield_dict[key] = value
 
             yield yield_dict
 
@@ -222,17 +210,13 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 "fullname": lora_on_disk.filename,
                 "hash": lora_on_disk.shorthash,
                 "preview": self.find_preview(path),
-                "description": self.find_description(path),
+                "description": f"{self.find_description(path)}|||{self.extras}",  # self.find_description(path),
                 "search_term": search_terms,  # self.search_terms_from_path(lora_on_disk.filename),
                 "prompt": prompt,
                 "local_preview": f"{path}.{shared.opts.samples_format}",
                 "metadata": metadata,
                 "tags": tags,
             }
-
-            if self.extras is not None:
-                for key, value in self.extras.items():
-                    yield_dict[key] = value
 
             yield yield_dict
 
@@ -275,7 +259,7 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
                 "name": name,
                 "filename": path,
                 "preview": self.find_preview(path),
-                "description": self.find_description(path),
+                "description": f"{self.find_description(path)}|||{self.extras}",  # self.find_description(path),
                 "search_term": search_terms,  # self.search_terms_from_path(lyco_on_disk.filename),
                 "prompt": (
                     json.dumps(f"<{self.base_name}:{name}")
@@ -287,37 +271,33 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
                 "sort_keys": {'default': index, **sort_keys},
             }
 
-            if self.extras is not None:
-                for key, value in self.extras.items():
-                    yield_dict[key] = value
-
             yield yield_dict
 
     def allowed_directories_for_previews(self):
         return [self.model_dir]
 
 
-def register_embeddings(descriptions_path, extras: dict):
+def register_embeddings(descriptions_path, extras: str):
     ui_extra_networks.register_page(EmbeddingsPage(descriptions_path, extras=extras))
 
 
-def register_hypernetworks(descriptions_path, extras: dict):
+def register_hypernetworks(descriptions_path, extras: str):
     ui_extra_networks.register_page(HypernetworksPage(descriptions_path, extras=extras))
 
 
-def register_checkpoints(descriptions_path, extras: dict):
+def register_checkpoints(descriptions_path, extras: str):
     ui_extra_networks.register_page(CheckpointsPage(descriptions_path, extras=extras))
 
 
-def register_loras(descriptions_path, extras: dict):
+def register_loras(descriptions_path, extras: str):
     ui_extra_networks.register_page(LoraPage(descriptions_path, extras=extras))
 
 
-def register_lycos(descriptions_path, extras: dict):
+def register_lycos(descriptions_path, extras: str):
     ui_extra_networks.register_page(LyCORISPage(descriptions_path, extras=extras))
 
 
-def register_all(description_paths, extras: dict):
+def register_all(description_paths, extras: str):
     embedding_path, hypernetwork_path, checkpoint_path, lora_path, lycos_path = description_paths
     register_embeddings(embedding_path, extras)
     register_hypernetworks(hypernetwork_path, extras)

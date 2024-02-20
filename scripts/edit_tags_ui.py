@@ -105,5 +105,5 @@ def on_ui_tabs():
 def on_ui_settings():
     section = ("sd_lora_tagger", "SD Lora Tagger")
     shared.opts.add_option("sd_lora_tagger_hide_nsfw_extra_networks",
-                           shared.OptionInfo(False, "Show Civitai Link events in the console", section=section))
+                           shared.OptionInfo(False, "Hide NSFW-tagged extra networks", section=section))
 

@@ -1,5 +1,6 @@
 import os
 import shutil
+import json
 
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
@@ -48,11 +49,18 @@ def register_pages():
                          os.path.join(lora_tagger_dir, "network_descriptions/Lora/"),
                          os.path.join(lora_tagger_dir, "network_descriptions/LyCORIS/"))
 
+    try:
+        hide_nsfw = shared.opts.data[hide_nsfw_networks_key]
+    except KeyError:
+        hide_nsfw = False
+
     item_decorator_dict = {
-        "hide_nsfw": shared.opts.data[hide_nsfw_networks_key],
+        "hide_nsfw": "true" if hide_nsfw else "false",
     }
 
-    register_all(description_paths, item_decorator_dict)
+    json_data = json.dumps(item_decorator_dict)
+
+    register_all(description_paths, json_data)
 
 
 class LoraTagger(scripts.Script):
