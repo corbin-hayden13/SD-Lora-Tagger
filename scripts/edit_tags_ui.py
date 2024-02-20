@@ -28,13 +28,20 @@ def populate_all_tags():
                     all_tags[tag] = [file_name]
 
 
+def save_text(*args):
+    file_path = args[0]["label"]
+    tags = args[1]
+
+    with open(file_path, "w") as f:
+        f.write(tags)
+
+
 def refresh_txt_files():
     pass
 
 
 def search_extra_networks(*args):
     dropdown = args[0]
-    print(f"SD Lora Tagger UI: dropdown={dropdown}")
     rows = args[1:]
     # If nothing is in the dropdown / no tags are being searched
     if len(dropdown) <= 0:
@@ -81,6 +88,7 @@ def on_ui_tabs():
 
                     with gr.Column(scale=2):
                         save_btn = gr.Button(value="Save", elem_id=f"{file_name}_save_btn")
+                        save_btn.click(fn=save_text, inputs=[gr.Label(value=txt_file, visible=False), textbox])
 
                         file_rows.append(save_btn)
 
