@@ -21,7 +21,7 @@ def update_hide_nsfw(extras=None):
 
     if extras is not None:
         extras_dict = json.loads(extras)
-        extras_dict["hide_nsfw"] = hide_nsfw
+        extras_dict["hide_nsfw"] = "true" if hide_nsfw else "false"
         return json.dumps(extras_dict)
 
     else: return extras
