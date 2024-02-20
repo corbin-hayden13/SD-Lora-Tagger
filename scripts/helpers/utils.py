@@ -43,7 +43,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
     networks = {
         "Lora": ["safetensors"],
         "LyCORIS": ["safetensors"],
-        "embeddings": ["pt"],
+        "embeddings": ["pt", "safetensors"],
         "hypernetworks": ["pt"],
         "Stable-diffusion": ["safetensors", "ckpt"],
     }
@@ -56,11 +56,15 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                 networks[key] = included_networks[key]
 
     for network in networks:
-        if not os.path.exists(os.path.join(models_path, f"{network}/")):
+        # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
+        if network == "embeddings" and not os.path.exists(os.path.join(models_path, f"{network}/")):
+            path = "./embeddings"
+        else: path = os.path.join(models_path, f"{network}/")
+
+        if not os.path.exists(path):
             print(f"SD Lora Tagger: No folder for {network} found in models directory")
             continue
 
-        path = os.path.join(models_path, network)
         files = [file.split(".")[0] for file in os.listdir(path) if file.split(".")[-1] in networks[network]]
 
         for file in files:

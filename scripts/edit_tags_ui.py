@@ -31,9 +31,14 @@ def populate_all_tags():
 def save_text(*args):
     file_path = args[0]["label"]
     tags = args[1]
+    dropdown = args[2]
 
     with open(file_path, "w") as f:
         f.write(tags)
+
+    populate_all_tags()
+
+    return gr.Dropdown().update(choices=list(all_tags.keys()))
 
 
 def refresh_txt_files():
@@ -87,7 +92,8 @@ def on_ui_tabs():
 
                     with gr.Column(scale=2):
                         save_btn = gr.Button(value="Save", elem_id=f"{file_name}_save_btn")
-                        save_btn.click(fn=save_text, inputs=[gr.Label(value=txt_file, visible=False), textbox])
+                        save_btn.click(fn=save_text, inputs=[gr.Label(value=txt_file, visible=False), textbox, search_bar],
+                                       outputs=search_bar)
 
                         file_rows.append(save_btn)
 
