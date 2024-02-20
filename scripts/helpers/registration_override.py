@@ -19,18 +19,16 @@ def parse_filename(path):
     return edited_filename.split("/")[-1]
 
 def get_or_create_tags_file(base_path, filename):
+    path = os.path.join(base_path, f"{parse_filename(filename).split('.')[0]}.txt")
     try:
-        with open(os.path.join(base_path,
-                                f"{parse_filename(filename).split('.')[0]}.txt"), "r") as f:
+        with open(path, 'r', encoding='utf8') as f:
             search_terms = f.read()
         return search_terms
     except FileNotFoundError:
-        path = os.path.join(base_path, f"{parse_filename(filename).split('.')[0]}.txt")
         if not os.path.isdir(base_path): 
             Path(base_path).mkdir(parents=True) # All directiories might not exist
 
-        print(f'path: {path}')
-        with open(path, "w") as f:
+        with open(path, 'w', encoding='utf-8') as f:
             search_terms = parse_filename(filename).split('.')[0]
             f.write(search_terms)
         return search_terms
