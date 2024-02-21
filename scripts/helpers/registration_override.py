@@ -82,7 +82,7 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
 
             yield_dict = {
                 "name": name,
-                "filename": path,
+                "filename": f"{path}.{_ext}",
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
                 "search_term": f"{search_terms}|||{self.extras}",  # self.search_terms_from_path(path),
@@ -121,7 +121,7 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
 
             yield_dict = {
                 "name": checkpoint.name_for_extra,
-                "filename": path,
+                "filename": checkpoint.filename,
                 "fullname": checkpoint.filename,
                 "hash": checkpoint.shorthash,
                 "preview": self.find_preview(path),
@@ -178,7 +178,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
 
             yield_dict = {
                 "name": name,
-                "filename": path,
+                "filename": lora_on_disk.filename,
                 "fullname": lora_on_disk.filename,
                 "hash": lora_on_disk.shorthash,
                 "preview": self.find_preview(path),
@@ -222,7 +222,7 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
 
             yield_dict = {
                 "name": name,
-                "filename": path,
+                "filename": lyco_on_disk.filename,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
                 "search_term": f"{search_terms}|||{self.extras}",  # self.search_terms_from_path(lyco_on_disk.filename),
