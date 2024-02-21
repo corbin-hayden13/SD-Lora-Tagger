@@ -1,6 +1,7 @@
 import os
 import json
 import html
+from pathlib import Path
 
 from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_networks
 from modules.textual_inversion.textual_inversion import Embedding
