@@ -5,7 +5,7 @@ import gradio as gr
 import modules.scripts as scripts
 import modules.shared as shared
 
-from scripts.globals import update_hide_nsfw, hide_nsfw
+from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path
 
 
 global all_tags, all_txt_files
@@ -14,7 +14,7 @@ global all_tags, all_txt_files
 def populate_all_tags():
     global all_tags, all_txt_files
 
-    txt_pattern = os.path.join(scripts.basedir(), "network_descriptions/**/*.txt")
+    txt_pattern = os.path.join(f"{network_descriptions_path}/**/*.txt")
     print(f"SD Lora Tagger UI: txt_pattern={txt_pattern}")
     all_txt_files = glob.glob(txt_pattern, recursive=True)
     all_tags = {}
@@ -32,6 +32,8 @@ def populate_all_tags():
 
 
 def save_text(*args):
+    global all_tags
+
     file_path = args[0]["label"]
     tags = args[1]
 
@@ -40,7 +42,7 @@ def save_text(*args):
 
     populate_all_tags()
 
-    return list(all_tags.keys())
+    return gr.Dropdown.update(choices=list(all_tags.keys()))
 
 
 def refresh_txt_files():
