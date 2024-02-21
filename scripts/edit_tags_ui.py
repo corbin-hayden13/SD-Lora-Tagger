@@ -2,7 +2,6 @@ import os
 import glob
 import gradio as gr
 
-import modules.scripts as scripts
 import modules.shared as shared
 
 from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path
@@ -42,7 +41,8 @@ def save_text(*args):
 
     populate_all_tags()
 
-    return gr.Dropdown.update(choices=list(all_tags.keys()))
+    return [gr.Dropdown.update(choices=list(all_tags.keys())),
+            gr.Textbox.update(value=tags)]
 
 
 def refresh_txt_files():
@@ -115,7 +115,7 @@ def on_ui_tabs():
                     with gr.Column(scale=2):
                         save_btn = gr.Button(value="Save", elem_id=f"{file_name}_save_btn",  visible=set_visible)
                         save_btn.click(fn=save_text, inputs=[gr.Label(value=txt_file, visible=False), textbox],
-                                       outputs=[search_bar])
+                                       outputs=[search_bar, textbox])
 
                         file_rows.append(save_btn)
 
