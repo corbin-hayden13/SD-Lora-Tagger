@@ -2,6 +2,7 @@ import os
 from glob import glob
 import sys
 from importlib import import_module
+from pathlib import Path
 from modules import paths_internal
 
 
@@ -76,6 +77,24 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
 
                 with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w") as f:
                     f.write(file)
+
+
+def get_or_create_tags_file(base_path, filename):
+    path = os.path.join(base_path, f"{os.path.basename(filename).split('.')[0]}.txt")
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            search_terms = f.read()
+
+        return search_terms
+    except FileNotFoundError:
+        if not os.path.isdir(base_path):
+            Path(base_path).mkdir(parents=True)  # All directories might not exist
+
+        with open(path, 'w', encoding='utf-8') as f:
+            search_terms = os.path.basename(filename).split('.')[0]
+            f.write(search_terms)
+
+        return search_terms
 
 
 def load_tags(descriptions_path):

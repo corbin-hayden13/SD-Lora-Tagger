@@ -1,5 +1,6 @@
 import os
 import shutil
+import json
 
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
@@ -9,7 +10,8 @@ from modules.ui_extra_networks import extra_pages
 
 from scripts.helpers.utils import init_extra_network_tags
 from scripts.helpers.registration_override import register_all
-from scripts.edit_tags_ui import on_ui_tabs, populate_all_tags
+from scripts.edit_tags_ui import on_ui_tabs, on_ui_settings, populate_all_tags
+from scripts.globals import hide_nsfw
 
 
 txt2img_extras_refresh_comp = None
@@ -46,7 +48,13 @@ def register_pages():
                          os.path.join(lora_tagger_dir, "network_descriptions/Lora/"),
                          os.path.join(lora_tagger_dir, "network_descriptions/LyCORIS/"))
 
-    register_all(description_paths)
+    item_decorator_dict = {
+        "hide_nsfw": "true" if hide_nsfw else "false",
+    }
+
+    json_data = json.dumps(item_decorator_dict)
+
+    register_all(description_paths, json_data)
 
 
 class LoraTagger(scripts.Script):
@@ -80,5 +88,7 @@ class LoraTagger(scripts.Script):
 #   by removing their on_before_ui() callback functions before they're called
 callback_map["callbacks_before_ui"] = [item for item in callback_map["callbacks_before_ui"]
                                        if os.path.basename(item.script) not in override_before_ui]
+
 script_callbacks.on_before_ui(register_pages)
 script_callbacks.on_ui_tabs(on_ui_tabs)
+script_callbacks.on_ui_settings(on_ui_settings)
