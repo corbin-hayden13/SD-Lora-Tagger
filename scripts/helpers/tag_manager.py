@@ -9,10 +9,15 @@ class Tag(object):
     description: str
     models: list[str]
 
-    def __init__(self, js: dict):
-        self.name = None if 'name' not in js else js['name']
-        self.description = None if 'description' not in js else js['description']
-        self.models = None if 'models' not in js else js['models']
+    def __init__(self, js: dict = None, name = '', description = '', models = []):
+        if js is not None:
+            self.name = None if 'name' not in js else js['name']
+            self.description = None if 'description' not in js else js['description']
+            self.models = None if 'models' not in js else js['models']
+        else:
+            self.name = name
+            self.description = description
+            self.models = models
     
     def toJSON(self):
         return self.__dict__
@@ -66,6 +71,18 @@ def load_tags():
     print(f'SD-Lora-Tagger: Loaded {count} tags')
 
     
+def to_dataframe():
+    output = []
+
+    for tag in tags:
+        row = []
+        row.append(tag.name)
+        row.append(tag.description)
+        row.append(len(tag.models))
+        output.append(row)
+    
+    return output
+
 def save_tags():
     # This feels very wrong, probably worth replacing
     data = []

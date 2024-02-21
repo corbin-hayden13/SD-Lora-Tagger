@@ -85,7 +85,7 @@ def on_ui_tabs():
                 file_name = os.path.basename(txt_file).split(".")[0]
                 file_data = ''
 
-                with open(txt_file, "r", encoding='utf-8') as f:
+                with open(txt_file, "r", encoding='utf8') as f:
                     data = f.read()
                     file_data = data.replace(f"{file_name}, ", "") # Exclude file name as it is not a tag (will still be added on save)
                     #print(f'{file_name}: "{file_data}"') 
