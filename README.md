@@ -13,3 +13,9 @@ This extension allows searching extra netwroks by tag files that can be created 
 
 This extension is built to work with the major distributions of the `AUTOMATIC1111/stable-diffusion-webui` including the popular `vladmandic/automatic` fork.
  - If the extension is bugged on your specific fork of the `AUTOMATIC1111/stable-diffusion-webui`, please create an issue and I will try to address it as soon as possible
+
+
+### For Reported Issues
+If an issue is reported either through the model page on CivitAI or directly through issues on this repo, the issue will be marked as a "bug" and "unconfirmed" until it can be recreated, at which point it will be marked "confirmed".
+
+If an issue remains "unconfirmed" for more than 48 hours it will be closed just to keep the issues page clean and avoid reported bugs where the issue was the extension was out of date.
