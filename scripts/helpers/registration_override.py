@@ -36,7 +36,7 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
 
             for root, _dirs, fns in os.walk(embeddings_dir, followlinks=True):
                 for fn in fns:
-                    if fn.lower().endswith(".pt"):
+                    if fn.lower().endswith(".pt") or fn.lower().endswith(".safetensors"):
                         embedding = Embedding(0, fn)
                         embedding.filename = os.path.join(root, fn)
                         embeddings.append(embedding)
