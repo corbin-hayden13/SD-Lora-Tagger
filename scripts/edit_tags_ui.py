@@ -59,11 +59,11 @@ def search_extra_networks(*args):
         ret_list = [gr.Dropdown.update()]
         for a in range(1, len(args), 2):
             if "nsfw" in rows[a] and hide_nsfw:
-                ret_list.append(gr.Textbox().update(visible=False))
+                ret_list.append(gr.Textbox().update(visible=False, container=False))
                 ret_list.append(gr.Button().update(visible=False))
 
             else:
-                ret_list.append(gr.Textbox().update(visible=True))
+                ret_list.append(gr.Textbox().update(visible=True, container=True))
                 ret_list.append(gr.Button().update(visible=True))
 
         return ret_list
@@ -71,17 +71,17 @@ def search_extra_networks(*args):
     new_rows = [gr.Dropdown().update()]
     for a in range(0, len(rows), 2):
         if "nsfw" in rows[a] and hide_nsfw:
-            new_rows.append(gr.Textbox().update(visible=False))
+            new_rows.append(gr.Textbox().update(visible=False, container=False))
             new_rows.append(gr.Button().update(visible=False))
             continue
 
         for tag in dropdown:
             if tag in rows[a]:
-                new_rows.append(gr.Textbox().update(visible=True))
+                new_rows.append(gr.Textbox().update(visible=True, container=True))
                 new_rows.append(gr.Button().update(visible=True))
 
             else:
-                new_rows.append(gr.Textbox().update(visible=False))
+                new_rows.append(gr.Textbox().update(visible=False, container=False))
                 new_rows.append(gr.Button().update(visible=False))
 
     return new_rows
@@ -104,7 +104,7 @@ def on_ui_tabs():
 
                 set_visible = not ("nsfw" in file_data.lower().split(",") and hide_nsfw)
 
-                with gr.Row(elem_id=f"{file_name}_row_container") as new_file_row:
+                with gr.Row(elem_id=f"{file_name}_row_container", equal_height=True) as new_file_row:
                     with gr.Column(elem_id=f"{file_name}_textbox_col", scale=7):
                         # Adds file path to info for later reference when saving
                         textbox = gr.Textbox(label=file_name, value=file_data, elem_id=f"{file_name}_textbox",
