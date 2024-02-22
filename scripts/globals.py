@@ -21,7 +21,7 @@ def update_hide_nsfw(extras=None):
         hide_nsfw = shared.opts.data[hide_nsfw_networks_key]
     except KeyError:
         hide_nsfw = False
-        print(f"SD Lora Tagger: KeyError on shared.opts.data, shared.opts.data={shared.opts.data}")
+        print(f"SD Lora Tagger: KeyError on shared.opts.data, defaulting to hide_nsfw={hide_nsfw}")
 
     if extras is not None:
         extras_dict = json.loads(extras)
