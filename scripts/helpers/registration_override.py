@@ -50,7 +50,8 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                 "filename": embedding.filename,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
-                "search_term": f"{search_terms}|||{self.extras}",  # self.search_terms_from_path(embedding.filename),
+                "search_term": f"{os.path.basename(embedding.filename)} {search_terms}|||{self.extras}",
+                # self.search_terms_from_path(embedding.filename),
                 "prompt": json.dumps(os.path.splitext(embedding.name)[0]),
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
@@ -85,7 +86,8 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
                 "filename": f"{path}.{_ext}",
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
-                "search_term": f"{search_terms}|||{self.extras}",  # self.search_terms_from_path(path),
+                "search_term": f"{os.path.basename(f'{path}.{_ext}')} {search_terms}|||{self.extras}",
+                # self.search_terms_from_path(path),
                 "prompt": json.dumps(f"<hypernet:{name}:{shared.opts.extra_networks_default_multiplier}>"),
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
@@ -126,7 +128,8 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
                 "hash": checkpoint.shorthash,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
-                "search_term": f"{search_terms}|||{self.extras}",  # f'{self.search_terms_from_path(checkpoint.filename)} {(checkpoint.sha256 or "")} /{checkpoint.type}/',
+                "search_term": f"{os.path.basename(checkpoint.filename)} {search_terms}|||{self.extras}",
+                # f'{self.search_terms_from_path(checkpoint.filename)} {(checkpoint.sha256 or "")} /{checkpoint.type}/',
                 "onclick": '"' + html.escape(f"""return selectCheckpoint({json.dumps(name)})""") + '"',
                 "local_preview": f"{path}.{shared.opts.samples_format}",
                 "metadata": checkpoint.metadata,
@@ -183,7 +186,8 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 "hash": lora_on_disk.shorthash,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
-                "search_term": f"{search_terms}|||{self.extras}",  # self.search_terms_from_path(lora_on_disk.filename),
+                "search_term": f"{os.path.basename(lora_on_disk.filename)} {search_terms}|||{self.extras}",
+                # self.search_terms_from_path(lora_on_disk.filename),
                 "prompt": prompt,
                 "local_preview": f"{path}.{shared.opts.samples_format}",
                 "metadata": metadata,
@@ -225,11 +229,12 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
                 "filename": lyco_on_disk.filename,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
-                "search_term": f"{search_terms}|||{self.extras}",  # self.search_terms_from_path(lyco_on_disk.filename),
+                "search_term": f"{os.path.basename(lyco_on_disk.filename)} {search_terms}|||{self.extras}",
+                # self.search_terms_from_path(lyco_on_disk.filename),
                 "prompt": (
-                    json.dumps(f"<{self.base_name}:{name}")
-                    + " + " + json.dumps(f':{shared.opts.extra_networks_default_multiplier}')
-                    + " + " + json.dumps(">")
+                        json.dumps(f"<{self.base_name}:{name}")
+                        + " + " + json.dumps(f':{shared.opts.extra_networks_default_multiplier}')
+                        + " + " + json.dumps(">")
                 ),
                 "local_preview": f"{path}.{shared.opts.samples_format}",
                 "metadata": json.dumps(lyco_on_disk.metadata, indent=4) if lyco_on_disk.metadata else None,
