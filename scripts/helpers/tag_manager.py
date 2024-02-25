@@ -55,7 +55,7 @@ def get_or_create_tags_file() -> str:
         print('SD-Lora-Tagger: Tags file did not exist, creating one...')
         with open(tags_path, 'w', encoding='utf-8') as f:
             try:
-                return f.write('')
+                return f.write(json.dumps[Tag(name='tag', description='An example tag to get your started', models=[])])
             except FileNotFoundError as e:
                 print(f'SD-Lora-Tagger: Failed to create tag file\n{e}')
 
@@ -85,8 +85,7 @@ def save_tags():
 
     with open(tags_path, 'w', encoding='utf-8') as f:
         f.write(js)
-    
-    update_cache()
+
 
 def remove_tag(index = -1):
     tags.pop(index)
