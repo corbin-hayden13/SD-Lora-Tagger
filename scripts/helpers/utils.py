@@ -1,11 +1,8 @@
 import os
-import io
 from glob import glob
 import sys
 from importlib import import_module
 from pathlib import Path
-import json
-import hashlib
 
 from modules import paths_internal
 
@@ -72,15 +69,24 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
             print(f"SD Lora Tagger: No folder for {network} found in models directory")
             continue
 
-        files = [file.split(".")[0] for file in os.listdir(path) if file.split(".")[-1] in networks[network]]
-
+        files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
+        print(f"SD Lora Tagger: files={files}")
+        file_paths_to_write_info = []
         for file in files:
-            if not os.path.exists(os.path.join(descriptions_path, f"{network}/{file}.txt")):
+            # Creating and writing to tag files if they don't exist
+            if not os.path.exists(os.path.join(descriptions_path, f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt")):
                 if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
                     os.mkdir(os.path.join(descriptions_path, f"{network}/"))
 
-                with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w") as f:
+                with open(os.path.join(descriptions_path, f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt"), "w",
+                          encoding="utf-8") as f:
                     f.write(file)
+
+            # Creating a civitai.info file (just a json file of the response from a civitai api call)
+            if not os.path.exists(os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info")):
+                file_paths_to_write_info.append(file)
+
+
 
 
 def get_or_create_tags_file(base_path, filename):
@@ -110,65 +116,8 @@ def clear_js_overrides(directory):
                 os.remove(source_file)
 
 
-def gen_sha256(file_path):
-    """
-    Copied from the Civitai Browser+ extension
-    https://github.com/BlafKing/sd-civitai-browser-plus
-    :param file_path: full file path for model to be hashed
-    :return: sha_256 hash as str
-    """
-    json_file = os.path.splitext(file_path)[0] + ".json"
-
-    if os.path.exists(json_file):
-        try:
-            with open(json_file, 'r', encoding="utf-8") as f:
-                data = json.load(f)
-
-            if 'sha256' in data and data['sha256']:
-                hash_value = data['sha256']
-                return hash_value
-        except Exception as e:
-            print(f"SD Lora Tagger: Failed to open {json_file}; {e}")
-
-    def read_chunks(file, size=io.DEFAULT_BUFFER_SIZE):
-        while True:
-            chunk = file.read(size)
-            if not chunk:
-                break
-            yield chunk
-
-    blocksize = 1 << 20
-    h = hashlib.sha256()
-    length = 0
-    with open(os.path.realpath(file_path), 'rb') as f:
-        for block in read_chunks(f, size=blocksize):
-            length += len(block)
-            h.update(block)
-
-    hash_value = h.hexdigest()
-
-    if os.path.exists(json_file):
-        try:
-            with open(json_file, 'r', encoding="utf-8") as f:
-                data = json.load(f)
-
-            if 'sha256' in data and data['sha256']:
-                data['sha256'] = hash_value
-
-            with open(json_file, 'w', encoding="utf-8") as f:
-                json.dump(data, f, indent=4)
-        except Exception as e:
-            print(f"Failed to open {json_file}: {e}")
-    else:
-        data = {'sha256': hash_value}
-        with open(json_file, 'w', encoding="utf-8") as f:
-            json.dump(data, f, indent=4)
-
-    return hash_value
-
-
 def load_tags(descriptions_path):
-    files = [file for file in glob(os.path.join(descriptions_path, "**/*.txt"), recursive=True) if file.split(".")[-1] == "txt"]
+    files = glob(os.path.join(descriptions_path, "**/*.txt"), recursive=True)
     all_tags = {}
 
     for file in files:

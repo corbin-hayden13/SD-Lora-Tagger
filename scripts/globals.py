@@ -2,7 +2,7 @@ import json
 import os
 
 import modules.scripts as scripts
-import modules.shared as shared, opts
+from modules.shared import opts
 
 
 global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
