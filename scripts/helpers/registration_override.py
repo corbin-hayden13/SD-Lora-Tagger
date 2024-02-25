@@ -289,12 +289,12 @@ def register_lycos(descriptions_path, extras: str):
 
 def register_all(description_paths, extras: str):
     checkpoint_path, embedding_path, hypernetwork_path, lora_path, lycos_path = description_paths
-    register_checkpoints(checkpoint_path)
-    register_embeddings(embedding_path)
-    register_hypernetworks(hypernetwork_path)
+    register_checkpoints(checkpoint_path, extras=extras)
+    register_embeddings(embedding_path, extras=extras)
+    register_hypernetworks(hypernetwork_path, extras=extras)
     if lora_exists:
-        register_loras(lora_path, extras)
+        register_loras(lora_path, extras=extras)
         extra_networks.register_extra_network(extra_networks_lora.ExtraNetworkLora())
     if lycoris_exists:
-        register_lycos(lycos_path, extras)
+        register_lycos(lycos_path, extras=extras)
 
