@@ -97,6 +97,15 @@ def get_or_create_tags_file(base_path, filename):
         return search_terms
 
 
+def clear_js_overrides(directory):
+    # https://stackoverflow.com/questions/61821102/how-can-i-delete-files-by-extension-in-subfolders-of-a-folder
+    for (dirname, dirs, files) in os.walk(directory):
+        for file in files:
+            if file.endswith('.js'):
+                source_file = os.path.join(dirname, file)
+                os.remove(source_file)
+
+
 def load_tags(descriptions_path):
     files = [file for file in glob(os.path.join(descriptions_path, "**/*.txt"), recursive=True) if file.split(".")[-1] == "txt"]
     all_tags = {}
