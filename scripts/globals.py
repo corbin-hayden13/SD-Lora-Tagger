@@ -2,7 +2,7 @@ import json
 import os
 
 import modules.scripts as scripts
-import modules.shared as shared
+import modules.shared as shared, opts
 
 
 global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
@@ -17,9 +17,8 @@ print(f"SD Lora Tagger: network_descriptions_path={network_descriptions_path}")
 def update_hide_nsfw(extras=None):
     global hide_nsfw_networks_key, hide_nsfw
 
-    try:
-        hide_nsfw = shared.opts.data[hide_nsfw_networks_key]
-    except KeyError:
+    hide_nsfw = getattr(opts, hide_nsfw_networks_key, None)
+    if hide_nsfw is None:
         hide_nsfw = False
         print(f"SD Lora Tagger: KeyError on shared.opts.data, defaulting to hide_nsfw={hide_nsfw}")
 
