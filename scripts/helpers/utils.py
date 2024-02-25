@@ -3,6 +3,7 @@ from glob import glob
 import sys
 from importlib import import_module
 from scripts.helpers.paths import extension_paths
+from pathlib import Path
 
 
 def import_lora_lycoris():
@@ -73,6 +74,33 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
 
                 with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w", encoding='utf8') as f:
                     f.write(file)
+
+
+def get_or_create_tags_file(base_path, filename):
+    path = os.path.join(base_path, f"{os.path.basename(filename).split('.')[0]}.txt")
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            search_terms = f.read()
+
+        return search_terms
+    except FileNotFoundError:
+        if not os.path.isdir(base_path):
+            Path(base_path).mkdir(parents=True)  # All directories might not exist
+
+        with open(path, 'w', encoding='utf-8') as f:
+            search_terms = os.path.basename(filename).split('.')[0]
+            f.write(search_terms)
+
+        return search_terms
+
+
+def clear_js_overrides(directory):
+    # https://stackoverflow.com/questions/61821102/how-can-i-delete-files-by-extension-in-subfolders-of-a-folder
+    for (dirname, dirs, files) in os.walk(directory):
+        for file in files:
+            if file.endswith('.js'):
+                source_file = os.path.join(dirname, file)
+                os.remove(source_file)
 
 
 def load_tags(descriptions_path):

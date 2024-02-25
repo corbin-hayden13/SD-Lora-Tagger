@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import scripts.ui_tag_editor
@@ -7,11 +8,14 @@ from modules.scripts import script_callbacks
 from modules.script_callbacks import callback_map
 from modules.ui_extra_networks import extra_pages
 
-from scripts.helpers.utils import init_extra_network_tags
+from scripts.helpers.utils import init_extra_network_tags, clear_js_overrides
 from scripts.helpers.registration_override import register_all
 from scripts.edit_tags_ui import populate_all_tags
 from scripts.ui_tag_editor import on_ui_tabs
 from scripts.helpers.paths import destination_path, source_path, models_dir, using_sd_next, model_description_dirs, description_path
+from scripts.edit_tags_ui import on_ui_settings, populate_all_tags
+from scripts.globals import hide_nsfw
+
 
 txt2img_extras_refresh_comp = None
 override_before_ui = ["lora_script.py", "lycoris_script.py", "ui_extra_networks.py"]
@@ -37,7 +41,13 @@ def register_pages():
                          model_description_dirs[3],
                          model_description_dirs[4])
 
-    register_all(description_paths)
+    item_decorator_dict = {
+        "hide_nsfw": "true" if hide_nsfw else "false",
+    }
+
+    json_data = json.dumps(item_decorator_dict)
+
+    register_all(description_paths, json_data)
 
 
 class LoraTagger(scripts.Script):
@@ -71,5 +81,7 @@ class LoraTagger(scripts.Script):
 #   by removing their on_before_ui() callback functions before they're called
 callback_map["callbacks_before_ui"] = [item for item in callback_map["callbacks_before_ui"]
                                        if os.path.basename(item.script) not in override_before_ui]
+
 script_callbacks.on_before_ui(register_pages)
 script_callbacks.on_ui_tabs(on_ui_tabs)
+script_callbacks.on_ui_settings(on_ui_settings)
