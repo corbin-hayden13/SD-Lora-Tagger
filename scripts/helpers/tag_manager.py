@@ -48,16 +48,18 @@ def update_cache():
 
 
 def get_or_create_tags_file() -> str:
-    if os.path.exists(tags_path):
-        with open(tags_path, 'r', encoding='utf-8') as f:
-            return f.read()
-    else:
+    if not os.path.exists(tags_path):
         print('SD-Lora-Tagger: Tags file did not exist, creating one...')
         with open(tags_path, 'w', encoding='utf-8') as f:
             try:
-                return f.write(json.dumps[Tag(name='tag', description='An example tag to get your started', models=[])])
+                js = json.dumps([Tag(name='tag', description='An example tag to get your started', models=[]).toJSON()])
+                f.write(js)
+                return js
             except FileNotFoundError as e:
                 print(f'SD-Lora-Tagger: Failed to create tag file\n{e}')
+
+    with open(tags_path, 'r', encoding='utf-8') as f:
+        return f.read()
 
 
 def load_tags():
@@ -78,7 +80,7 @@ def save_tags():
     # This feels very wrong, probably worth replacing
     data = []
     for tag in tags:
-        tag.name = avoid_duplicate(tag.name)
+        tag.name = avoid_duplicate(tag.name, exclude_current=True)
         data.append(tag.toJSON())
     
     js = json.dumps(data, indent=4)
