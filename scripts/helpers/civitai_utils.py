@@ -5,9 +5,9 @@ import io
 import hashlib
 import time
 from fake_useragent import UserAgent
-from multiprocessing import cpu_count, Process, ProcessError, Queue
 
 from modules.shared import cmd_opts, opts
+from scripts.globals import out
 
 
 api_urls = {
@@ -60,14 +60,14 @@ def request_civit_api(api_url=None):
         response = requests.get(api_url, headers=headers, timeout=(10, 30))
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
-        print(f"SD Lora Tagger: {e}")
+        out(e)
         return timeout
     else:
         response.encoding = "utf-8"
         try:
             data = json.loads(response.text)
         except json.JSONDecodeError:
-            print("SD Lora Tagger: The CivitAI servers are currently offline. Please try again later.")
+            out("The CivitAI servers are currently offline. Please try again later.")
             return timeout
 
     return data
@@ -91,7 +91,7 @@ def gen_sha256(file_path):
                 hash_value = data['sha256']
                 return hash_value
         except Exception as e:
-            print(f"SD Lora Tagger: Failed to open {json_file}; {e}")
+            out(f"Failed to open {json_file}; {e}")
 
     def read_chunks(file, size=io.DEFAULT_BUFFER_SIZE):
         while True:
@@ -121,7 +121,7 @@ def gen_sha256(file_path):
             with open(json_file, 'w', encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
         except Exception as e:
-            print(f"Failed to open {json_file}: {e}")
+            out(f"Failed to open {json_file}: {e}")
     else:
         data = {'sha256': hash_value}
         with open(json_file, 'w', encoding="utf-8") as f:
@@ -137,59 +137,26 @@ def query_model_info(file_path):
         model_id = model_info["modelId"]
 
     except KeyError:  # Failed query
-        print(f"SD Lora Tagger: Failed to retrieve model info for {file_path}")
+        out(f"Failed to retrieve model info for {file_path}")
         return file_path, []
 
     model_info = request_civit_api(f"{api_urls['model_id']}{model_id}")
     try:
         return file_path, model_info
     except KeyError:
-        print(f"SD Lora Tagger: Failed to retrieve tags for {file_path}")
+        out(f"Failed to retrieve tags for {file_path}")
         return file_path, []
-
-
-def get_civitai_tags(file_paths, ret_queue):
-    path_and_info = []
-    for file in file_paths:
-        path_and_info.append(query_model_info(file))
-        time.sleep(0.5)
-
-    ret_queue.put(path_and_info)
 
 
 def model_info_query(file_paths):
     if len(file_paths) <= 0:
         return file_paths
 
-    cpus = cpu_count() - 1
-    files_per_process = len(file_paths) // cpus
-
-    path_folds = []
-    for a in range(cpus - 1):
-        path_folds.append(file_paths[a * files_per_process:(a * files_per_process) + files_per_process])
-
-    path_folds.append(file_paths[(cpus - 1) * files_per_process:])
-
-    processes_and_queues = []
-    for path_fold in path_folds:
-        ret_queue = Queue()
-        processes_and_queues.append((
-            Process(target=get_civitai_tags, args=(path_fold, ret_queue)),
-            ret_queue
-        ))
-
-    for process, _ in processes_and_queues:
-        process.start()
-
-    for process, _ in processes_and_queues:
-        process.join()
-
     paths_and_info = []
-    for _, queue in processes_and_queues:
-        while not queue.empty():
-            paths_and_info.extend(queue.get())
+    for file in file_paths:
+        paths_and_info.append(query_model_info(file))
 
-    print(f"SD Lora Tagger: paths_and_info =>\n{paths_and_info}")
+    out(f"paths_and_info =>\n{paths_and_info}")
     return paths_and_info
 
 

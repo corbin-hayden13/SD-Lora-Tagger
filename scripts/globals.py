@@ -3,19 +3,28 @@ import os
 
 import modules.scripts as scripts
 from modules.shared import opts
+from modules.cmd_args import parser
 
 
-global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
+global hide_nsfw
 
 
 def out(msg):
     print(f"SD Lora Tagger: {msg}")
 
 
-hide_nsfw_networks_key = "sd_lora_tagger_hide_nsfw_extra_networks"
-network_descriptions_path = os.path.join(scripts.basedir(), "network_descriptions")
+""" Paths """
+lora_tagger_dir = scripts.basedir()
+models_dir = './models'
+network_descriptions_path = os.path.join(lora_tagger_dir, "network_descriptions")
 
-out(f"network_descriptions_path={network_descriptions_path}")
+""" Options and Flags """
+js_overrides = ["sdNextExtraNetworks.js", "automatic1111ExtraNetworks.js"]
+override_before_ui = ["lora_script.py", "lycoris_script.py", "ui_extra_networks.py"]
+using_sd_next = parser.description is not None and parser.description == "SD.Next"
+
+""" Other """
+hide_nsfw_networks_key = "sd_lora_tagger_hide_nsfw_extra_networks"
 
 
 def update_hide_nsfw(extras=None):

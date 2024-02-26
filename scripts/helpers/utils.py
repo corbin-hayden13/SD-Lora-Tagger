@@ -10,6 +10,15 @@ from scripts.globals import out
 from modules import paths_internal
 
 
+networks = {
+        "Lora": ["safetensors"],
+        "LyCORIS": ["safetensors"],
+        "embeddings": ["pt", "safetensors"],
+        "hypernetworks": ["pt"],
+        "Stable-diffusion": ["safetensors", "ckpt"],
+    }
+
+
 def import_lora_lycoris():
     lora = None
     extra_networks_lora = None
@@ -39,6 +48,13 @@ def import_lora_lycoris():
 lora, extra_networks_lora, lycoris = import_lora_lycoris()
 
 
+def make_network_path(models_path, network_type):
+    # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
+    if network_type == "embeddings" and not os.path.exists(os.path.join(models_path, f"{network_type}/")):
+        return "./embeddings"
+    else: return os.path.join(models_path, f"{network_type}/")
+
+
 def init_extra_network_tags(models_path, descriptions_path, included_networks=None):
     """
     This is used in conjunction with the refresh feature for extra networks to update tag files for each network
@@ -47,13 +63,6 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
     :param included_networks: A dictionary of str: list as "network_folder_name": ["desired","file", "extensions"].  If not None, will extend existing known file extensions with provided ones
     :return: None
     """
-    networks = {
-        "Lora": ["safetensors"],
-        "LyCORIS": ["safetensors"],
-        "embeddings": ["pt", "safetensors"],
-        "hypernetworks": ["pt"],
-        "Stable-diffusion": ["safetensors", "ckpt"],
-    }
 
     if included_networks is not None:
         for key in included_networks:
@@ -63,18 +72,13 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                 networks[key] = included_networks[key]
 
     for network in networks:
-        # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
-        if network == "embeddings" and not os.path.exists(os.path.join(models_path, f"{network}/")):
-            path = "./embeddings"
-        else: path = os.path.join(models_path, f"{network}/")
+        path = make_network_path(models_path, network)
 
         if not os.path.exists(path):
             out(f"No folder for {network} found in models directory")
             continue
 
         files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
-        out(f"files={files}")
-        file_paths_to_write_info = []
         for file in files:
             # Creating and writing to tag files if they don't exist
             if not os.path.exists(os.path.join(descriptions_path, f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt")):
@@ -85,11 +89,18 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                           encoding="utf-8") as f:
                     f.write(file)
 
-            # Creating a civitai.info file (just a json file of the response from a civitai api call)
-            out(f"Checking existence of {os.path.join(path, f'{os.path.splitext(os.path.basename(file))[0]}.civitai.info')}")
-            if not os.path.exists(os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info")):
-                file_paths_to_write_info.append(os.path.join(path, file))
 
+def add_civitai_tags(models_path):
+    for network in networks:
+        path = make_network_path(models_path, network)
+
+        if not os.path.exists(path):
+            out(f"No folder for {network} found in models directory")
+            continue
+
+        files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
+        file_paths_to_write_info = [os.path.join(path, file) for file in files if not os.path.exists(
+            os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info"))]
         out(f"file_paths_to_write_info={file_paths_to_write_info}")
         paths_and_info = model_info_query(file_paths_to_write_info)
 
