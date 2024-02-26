@@ -1,5 +1,5 @@
 import gradio as gr
-from scripts.api import TagManagerAPI
+from scripts.api.base import TagManagerAPI
 
 class TagEditorUI():
     api: TagManagerAPI
