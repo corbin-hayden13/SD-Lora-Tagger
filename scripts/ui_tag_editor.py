@@ -1,3 +1,4 @@
+from ctypes import Union
 import scripts.helpers.tag_manager as tm
 import gradio as gr
 from gradio.blocks import BlockContext
@@ -15,11 +16,11 @@ def remove_row():
     return (data, update)
 
 
-def save(*args, data=None):
+def save(*args):
     if args[0]:
-        tm.save_changes(args[1] if data is None else data)
-        return toggle_component(False)
-    return toggle_component(True), tm.to_dataframe()
+        tm.save_changes(args[1])
+        return toggle_component(False), tm.to_dataframe()
+    return toggle_component(True), gr.update(value=args[1])
 
 
 def toggle_component(val):
@@ -46,7 +47,7 @@ def on_ui_tabs():
                         
                     with gr.Row():
                         data = tm.to_dataframe()
-                        frame = gr.Dataframe(
+                        frame = gr.Matrix(
                             data,
                             headers=['tag', 'description', 'models'],
                             datatype=['str', 'str', 'str'],
@@ -58,9 +59,12 @@ def on_ui_tabs():
                         print(f'DATAFRAME ROWS: {frame.row_count[0]}')
                         add_btn.click(fn=add_row, outputs=[frame, rem_btn])
                         rem_btn.click(fn=lambda _: remove_row(), outputs=[frame, rem_btn])
-                        save_btn.click(fn=lambda _: save(True, data=frame.value), outputs=[save_btn, frame])
+                        save_btn.click(fn=save, inputs=[gr.Checkbox(True, visible=False), frame], outputs=[save_btn, frame])
                         save_chk.change(fn=lambda val: toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
-                        frame.change(fn=lambda val: save(val, data=frame.value), inputs=[save_chk], outputs=[save_btn, frame])
+
+                        # This needs some attention. Currently it will never be completely updated without passing
+                        # in the dataframe as an input, which results in not being able to retrieve it's value
+                        frame.change(fn=save, inputs=[save_chk, frame], outputs=[save_btn, frame])
 
                         search_txt.input(fn=lambda text:tm.search(text), inputs=[search_txt], outputs=[frame])
     return [(sd_lora_tagger, "Tag Editor", "sd_lora_tagger")]

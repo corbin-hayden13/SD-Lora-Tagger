@@ -8,30 +8,11 @@ from modules.textual_inversion.textual_inversion import Embedding
 
 from scripts.helpers.utils import lora, lycoris, extra_networks_lora, get_or_create_tags_file
 from scripts.globals import update_hide_nsfw
+from scripts.helpers.tag_manager import get_search_terms
 
 
 lora_exists = lora is not None
 lycoris_exists = lycoris is not None
-
-
-def parse_filename(path):
-    edited_filename = path.replace("\\", "/")
-    return edited_filename.split("/")[-1]
-
-def get_or_create_tags_file(base_path, filename):
-    path = os.path.join(base_path, f"{parse_filename(filename).split('.')[0]}.txt")
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            search_terms = f.read()
-        return search_terms
-    except FileNotFoundError:
-        if not os.path.isdir(base_path): 
-            Path(base_path).mkdir(parents=True) # All directiories might not exist
-
-        with open(path, 'w', encoding='utf-8') as f:
-            search_terms = parse_filename(filename).split('.')[0] + ', '
-            f.write(search_terms)
-        return search_terms
 
 
 class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
@@ -197,7 +178,8 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 tags[' '.join(words[1:])] = words[0]
             # shared.log.debug(f'Lora: {path}: name={name} alias={alias} tags={tags}')
 
-            search_terms = get_or_create_tags_file(self.descriptions_path, lora_on_disk.filename)
+            #search_terms = get_or_create_tags_file(self.descriptions_path, lora_on_disk.filename)
+            search_terms = get_search_terms(name)
 
             yield_dict = {
                 "name": name,

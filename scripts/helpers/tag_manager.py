@@ -29,7 +29,11 @@ class Tag(object):
 
 tags: list[Tag] = []
 
+
 def update_cache():
+    """
+    NOT USED: Overwrites A1111's 'ui-config.json' file to update component values
+    """
     text = ""
     with open(ui_config_path, 'r', encoding='utf8') as f:
         text = f.read()
@@ -52,7 +56,7 @@ def get_or_create_tags_file() -> str:
         print('SD-Lora-Tagger: Tags file did not exist, creating one...')
         with open(tags_path, 'w', encoding='utf-8') as f:
             try:
-                js = json.dumps([Tag(name='tag', description='An example tag to get your started', models=[]).toJSON()])
+                js = json.dumps([Tag(name='tag', description='An example tag to get you started', models=[]).toJSON()])
                 f.write(js)
                 return js
             except FileNotFoundError as e:
@@ -63,6 +67,9 @@ def get_or_create_tags_file() -> str:
 
 
 def load_tags():
+    """
+    Loads all tags from JSON
+    """
     js = get_or_create_tags_file()
 
     count = 0
@@ -77,6 +84,9 @@ def load_tags():
 
 
 def save_tags():
+    """
+    Saves all tags to JSON
+    """
     # This feels very wrong, probably worth replacing
     data = []
     for tag in tags:
@@ -89,13 +99,31 @@ def save_tags():
         f.write(js)
 
 
+
+def add_tag():
+    """
+    Adds a new tag at index 0
+    """
+    tag = Tag(name='new_tag', description='new description', models=[])
+    tag.name = avoid_duplicate(tag.name)
+    # Add the tag to the start of the list for graphical convenience
+    tags.insert(0, tag)
+    return to_dataframe()
+
+
 def remove_tag(index = -1):
+    """
+    Removes a tag from the provided index. Removes the last item by default
+    """
     tags.pop(index)
     return to_dataframe()
 
 
 def save_changes(data):
-    for item in data["data"]:
+    """
+    Modifies tags according to the provided data
+    """
+    for item in data:
         tag = get_tag_by_name(item[0])
         if tag is None:
             tag = Tag()
@@ -104,11 +132,15 @@ def save_changes(data):
         tag.name = item[0]
         tag.description = item[1]
         tag.models = csv_to_list(item[2])
+        #print(f"name: '{tag.name}', \ndesc: '{tag.description}', \nmodels: '{list_to_csv(tag.models)}'\n")
 
     save_tags()
 
 
-def search(search_term: str):
+def search(search_term: str) -> list[list]:
+    """
+    Searches loaded tags based on the provided search term. Returns data for a dataframe
+    """
     if search_term == '' or search_term is None:
         return to_dataframe()
     
@@ -119,16 +151,13 @@ def search(search_term: str):
     return to_dataframe(filtered_tags)
 
 
-def add_tag():
-    tag = Tag(name='new_tag', description='new description', models=[])
-    tag.name = avoid_duplicate(tag.name)
-    # Add the tag to the start of the list for graphical convenience
-    tags.insert(0, tag)
-    return to_dataframe()
-
 # ----- UTILITY -----
 
+
 def to_dataframe(data: list[Tag] = None):
+    """
+    Converts a list of tags to values readable by the Gradio DataFrame
+    """
     output = []
     if data is None:
         data = tags
@@ -141,20 +170,60 @@ def to_dataframe(data: list[Tag] = None):
 
 
 def csv_to_list(data) -> list:
+    """
+    Converts comma seperated values to a python list
+    """
     ls = []
     for item in data.replace(' ', '').split(', '): # remove whitespaces and seperate by comma
         ls.append(item)
     return ls
 
 
+def list_to_csv(data: list):
+    """
+    Converts a list to a string of comma seperated values
+    """
+    return ', '.join(data)
+
+
 def get_tag_by_name(name: str):
+    """
+    Returns a tag with the provided name. Returns None if no tags with the provided name exists
+    """
     for tag in tags:
         if tag.name == name:
             return tag
     return None
 
 
+def get_tags_by_model(model_name: str) -> list[str]:
+    """
+    Returns a list of tags associated with the provided model
+    """
+    result = []
+    for tag in tags:
+        if model_name in tag.models:
+            result.append(tag.name) 
+    return result
+
+
+def get_search_terms(model_name: str) -> str:
+    """
+    Parses tags into a search term readable by A1111
+    """
+    tags = get_tags_by_model(model_name)
+    if len(tags) == 0:
+        return ''
+    return list_to_csv(tags)
+    
+
 def avoid_duplicate(tag_name: str, exclude_current = False):
+    """
+    Checks tags with the same name exists, and generates a unique suffix if it does.
+
+    Parameters:
+        exclude_current - Whether or not to exclude the current entry from the dupe check (use if calling before the current tag is loaded)
+    """
     count = 0
     for tag in tags:
         if tag.name == tag_name:
@@ -164,10 +233,10 @@ def avoid_duplicate(tag_name: str, exclude_current = False):
     return tag_name
 
 
-"""
-Recursive function to avoid duplicate tag names
-"""
 def generate_suffix_recursive(tag_name: str, i = 0) -> str: 
+    """
+    Recursive function to avoid duplicate tag names
+    """
     if get_tag_by_name(f'{tag_name}_{i}') is not None:
         return generate_suffix_recursive(tag_name, i+1)
     
