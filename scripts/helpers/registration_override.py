@@ -6,7 +6,7 @@ from pathlib import Path
 from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_networks
 from modules.textual_inversion.textual_inversion import Embedding
 
-from scripts.helpers.utils import lora, lycoris, extra_networks_lora, get_or_create_tags_file
+from scripts.helpers.utils import lora, lycoris, extra_networks_lora, get_or_create_tags_file, out
 from scripts.globals import update_hide_nsfw
 
 

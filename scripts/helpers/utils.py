@@ -4,6 +4,9 @@ import sys
 from importlib import import_module
 from pathlib import Path
 
+from scripts.helpers.civitai_utils import model_info_query
+from scripts.globals import out
+
 from modules import paths_internal
 
 
@@ -23,12 +26,12 @@ def import_lora_lycoris():
         lora = import_module("lora")
         extra_networks_lora = import_module("extra_networks_lora")
     except ModuleNotFoundError:
-        print("The Lora extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+        out("The Lora extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
 
     try:
         lycoris = import_module("lycoris")
     except ModuleNotFoundError:
-        print("The LyCORIS extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+        out("The LyCORIS extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
 
     return lora, extra_networks_lora, lycoris
 
@@ -66,11 +69,11 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
         else: path = os.path.join(models_path, f"{network}/")
 
         if not os.path.exists(path):
-            print(f"SD Lora Tagger: No folder for {network} found in models directory")
+            out(f"No folder for {network} found in models directory")
             continue
 
         files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
-        print(f"SD Lora Tagger: files={files}")
+        out(f"files={files}")
         file_paths_to_write_info = []
         for file in files:
             # Creating and writing to tag files if they don't exist
@@ -83,10 +86,12 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                     f.write(file)
 
             # Creating a civitai.info file (just a json file of the response from a civitai api call)
+            out(f"Checking existence of {os.path.join(path, f'{os.path.splitext(os.path.basename(file))[0]}.civitai.info')}")
             if not os.path.exists(os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info")):
-                file_paths_to_write_info.append(file)
+                file_paths_to_write_info.append(os.path.join(path, file))
 
-
+        out(f"file_paths_to_write_info={file_paths_to_write_info}")
+        paths_and_info = model_info_query(file_paths_to_write_info)
 
 
 def get_or_create_tags_file(base_path, filename):

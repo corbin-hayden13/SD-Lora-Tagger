@@ -11,7 +11,7 @@ from modules.ui_extra_networks import extra_pages
 from scripts.helpers.utils import init_extra_network_tags, clear_js_overrides
 from scripts.helpers.registration_override import register_all
 from scripts.edit_tags_ui import on_ui_tabs, on_ui_settings, populate_all_tags
-from scripts.globals import hide_nsfw
+from scripts.globals import hide_nsfw, out
 
 
 txt2img_extras_refresh_comp = None
@@ -37,7 +37,7 @@ try:
 
     shutil.copy(source_path, destination_path)
 except Exception as e:
-    print(f"SD Lora Tagger: using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
+    out(f"using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 populate_all_tags()
