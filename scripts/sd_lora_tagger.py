@@ -81,7 +81,7 @@ class LoraTagger(scripts.Script):
 
 api = TagManagerAPIv1()
 ui = TagEditorUI(api)
-api.set_display_method(0)
+api.set_display_method(1)
 
 # Stops Lora, LyCORIS from rendering their own extra_network pages alongside the custom ones
 #   by removing their on_before_ui() callback functions before they're called

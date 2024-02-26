@@ -1,7 +1,8 @@
-from scripts.api import TagManagerAPI
+from scripts.api.base import TagManagerAPI
+from scripts.helpers.utils import csv_to_list, list_to_csv
 
 class TagManagerAPIv1(TagManagerAPI):
-    from scripts.helpers.utils import csv_to_list, list_to_csv
+    
     from typing import Literal
 
     name = "TagManagerAPI v1"
@@ -43,7 +44,7 @@ class TagManagerAPIv1(TagManagerAPI):
         result = []
         models = self.tm.get_tagged_models()
         for model in models:
-            result.append([model, '', self.list_to_csv(self.tm.get_tags_by_model(model))])
+            result.append([model, '', list_to_csv(self.tm.get_tags_by_model(model))])
         return result
     
     def __write_from_model_display(self, data: list[list[str]]):
@@ -53,7 +54,7 @@ class TagManagerAPIv1(TagManagerAPI):
         for item in data:
             if item == '':
                 continue
-            tags = self.csv_to_list(item[2])
+            tags = csv_to_list(item[2])
             for tag in tags:
                 obj = self.tm.get_tag_by_name(tag)
                 if obj is None:
