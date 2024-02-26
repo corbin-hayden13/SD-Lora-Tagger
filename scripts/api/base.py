@@ -24,6 +24,9 @@ class TagManagerAPI():
     def save(self, data: list[list[str]]) -> list[list[str]]:
         pass
 
+    def get_headers(self) -> list[str]:
+        pass
+
     def load_tags(self):
         self.tm.load_tags()
 

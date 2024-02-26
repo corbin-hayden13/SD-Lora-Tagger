@@ -37,6 +37,12 @@ class TagManagerAPIv1(TagManagerAPI):
             if self.display_method == 1:
                 return self.__write_from_model_display(base_data)
 
+    def get_headers(self) -> list[str]:
+        if self.display_method == 0:
+            return ['Tag', 'Description', 'Models']
+        if self.display_method== 1:
+            return ['Model', ' ', 'Tags']
+
     def __read_to_model_display(self):
         """
         Converts from tag display to model display

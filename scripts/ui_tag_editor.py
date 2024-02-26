@@ -48,7 +48,7 @@ class TagEditorUI():
                             data = self.api.read_all_tags()
                             frame = gr.Matrix(
                                 data,
-                                headers=['tag', 'description', 'models'],
+                                headers=self.api.get_headers(),
                                 datatype=['str', 'str', 'str'],
                                 row_count=(len(data), 'dynamic'),
                                 col_count=(3, 'fixed'),
