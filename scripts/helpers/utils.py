@@ -4,9 +4,8 @@ import sys
 from importlib import import_module
 from pathlib import Path
 
-from scripts.helpers.civitai_utils import model_info_query
-from scripts.helpers.tag_manager import write_files_by_network, append_files_by_network
-from scripts.globals import out, networks
+from scripts.helpers.tag_manager import write_files_by_network
+from scripts.globals import out, networks, models_dir
 
 from modules import paths_internal
 
@@ -40,11 +39,11 @@ def import_lora_lycoris():
 lora, extra_networks_lora, lycoris = import_lora_lycoris()
 
 
-def make_network_path(models_path, network_type):
+def make_network_path(network_type):
     # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
-    if network_type == "embeddings" and not os.path.exists(os.path.join(models_path, f"{network_type}/")):
+    if network_type == "embeddings" and not os.path.exists(os.path.join(models_dir, f"{network_type}/")):
         return "./embeddings"
-    else: return os.path.join(models_path, f"{network_type}/")
+    else: return os.path.join(models_dir, f"{network_type}/")
 
 
 def init_extra_network_tags(models_path, descriptions_path, included_networks=None):
@@ -64,7 +63,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                 networks[key] = included_networks[key]
 
     for network in networks:
-        path = make_network_path(models_path, network)
+        path = make_network_path(network)
 
         if not os.path.exists(path):
             out(f"No folder for {network} found in models directory")
@@ -72,30 +71,6 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
 
         files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
         write_files_by_network(network, files)
-
-
-def add_civitai_tags(models_path):
-    for network in networks:
-        path = make_network_path(models_path, network)
-
-        if not os.path.exists(path):
-            out(f"No folder for {network} found in models directory")
-            continue
-
-        files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
-        file_paths_to_write_info = [os.path.join(path, file) for file in files if not os.path.exists(
-            os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info"))]
-        out(f"file_paths_to_write_info={file_paths_to_write_info}")
-        paths_and_info = model_info_query(file_paths_to_write_info)
-        paths_and_tags = []
-        for path, info in paths_and_info:
-            tags = ""
-            for tag in info["tags"]:
-                tags += f"{tag},"
-
-            paths_and_tags.append((path, tags[:-1]))
-
-        append_files_by_network(network, paths_and_tags)
 
 
 def get_or_create_tags_file(base_path, filename):

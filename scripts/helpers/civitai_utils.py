@@ -7,7 +7,9 @@ import time
 from fake_useragent import UserAgent
 
 from modules.shared import cmd_opts, opts
-from scripts.globals import out
+from scripts.globals import out, networks
+from scripts.helpers.tag_manager import append_files_by_network
+from scripts.helpers.utils import make_network_path
 
 
 api_urls = {
@@ -156,7 +158,30 @@ def model_info_query(file_paths):
     for file in file_paths:
         paths_and_info.append(query_model_info(file))
 
-    out(f"paths_and_info =>\n{paths_and_info}")
+    out(f"paths_and_info =>\n{[list(info.keys()) for _, info in paths_and_info]}")
     return paths_and_info
 
+
+def add_civitai_tags():
+    for network in networks:
+        path = make_network_path(network)
+
+        if not os.path.exists(path):
+            out(f"No folder for {network} found in models directory")
+            continue
+
+        files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
+        file_paths_to_write_info = [os.path.join(path, file) for file in files if not os.path.exists(
+            os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info"))]
+        out(f"file_paths_to_write_info={file_paths_to_write_info}")
+        paths_and_info = model_info_query(file_paths_to_write_info)
+        paths_and_tags = []
+        for path, info in paths_and_info:
+            tags = ""
+            for tag in info["tags"]:
+                tags += f"{tag},"
+
+            paths_and_tags.append((path, tags[:-1]))
+
+        append_files_by_network(network, paths_and_tags)
 
