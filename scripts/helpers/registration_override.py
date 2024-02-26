@@ -44,10 +44,12 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
         for embedding in embeddings:
             path, _ext = os.path.splitext(embedding.filename)
 
-            search_terms = get_or_create_tags_file(self.descriptions_path, embedding.filename)
+            # search_terms = get_or_create_tags_file(self.descriptions_path, embedding.filename)
+            name = os.path.splitext(embedding.name)[0]
+            search_terms = get_search_terms(name)
 
             yield_dict = {
-                "name": os.path.splitext(embedding.name)[0],
+                "name": name,
                 "filename": embedding.filename,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
@@ -80,7 +82,8 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
         for name, path in shared.hypernetworks.items():
             path, _ext = os.path.splitext(path)
 
-            search_terms = get_or_create_tags_file(self.descriptions_path, path)
+            # search_terms = get_or_create_tags_file(self.descriptions_path, path)
+            search_terms = get_search_terms(name)
 
             yield_dict = {
                 "name": name,
@@ -120,7 +123,8 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
         for name, checkpoint in sd_models.checkpoints_list.items():
             path, _ext = os.path.splitext(checkpoint.filename)
 
-            search_terms = get_or_create_tags_file(self.descriptions_path, checkpoint.filename)
+            #search_terms = get_or_create_tags_file(self.descriptions_path, checkpoint.filename)
+            search_terms = get_search_terms(name)
 
             yield_dict = {
                 "name": checkpoint.name_for_extra,
@@ -224,7 +228,8 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
             path, ext = os.path.splitext(lyco_on_disk.filename)
             sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
 
-            search_terms = get_or_create_tags_file(self.descriptions_path, lyco_on_disk.filename)
+            # search_terms = get_or_create_tags_file(self.descriptions_path, lyco_on_disk.filename)
+            search_terms = get_search_terms(name)
 
             yield_dict = {
                 "name": name,
