@@ -119,3 +119,20 @@ def load_tags(descriptions_path):
                     all_tags[tag] = [file.replace(f'{file_name}, ', '')]
 
     return all_tags
+
+
+def csv_to_list(data) -> list:
+    """
+    Converts comma seperated values to a python list
+    """
+    ls = []
+    for item in data.replace(' ', '').split(','): # remove whitespaces and seperate by comma
+        ls.append(item)
+    return ls
+
+
+def list_to_csv(data: list):
+    """
+    Converts a list to a string of comma seperated values
+    """
+    return ', '.join(data)

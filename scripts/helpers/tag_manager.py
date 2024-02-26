@@ -3,6 +3,7 @@ import os
 import re
 
 from scripts.helpers.paths import tags_path, ui_config_path, ui_config_debug
+from scripts.helpers.utils import csv_to_list, list_to_csv
 
 class Tag(object):
     name: str
@@ -100,14 +101,18 @@ def save_tags():
 
 
 
-def add_tag():
+def add_tag(new_tag: Tag = None, index = 0):
     """
-    Adds a new tag at index 0
+    Adds a new tag at the given index (default: 0), creates a new tag using default values if 'new_tag' is not provided.
     """
+    if new_tag is not None:
+        tags.insert(index, new_tag)
+        return to_dataframe()
+
     tag = Tag(name='new_tag', description='new description', models=[])
     tag.name = avoid_duplicate(tag.name)
     # Add the tag to the start of the list for graphical convenience
-    tags.insert(0, tag)
+    tags.insert(index, tag)
     return to_dataframe()
 
 
@@ -169,21 +174,14 @@ def to_dataframe(data: list[Tag] = None):
     return output
 
 
-def csv_to_list(data) -> list:
-    """
-    Converts comma seperated values to a python list
-    """
-    ls = []
-    for item in data.replace(' ', '').split(', '): # remove whitespaces and seperate by comma
-        ls.append(item)
-    return ls
+def get_tagged_models() -> list[str]:
+    models = []
+    for tag in tags:
+        for model in tag.models:
+            if model not in models:
+                models.append(model)
+    return models
 
-
-def list_to_csv(data: list):
-    """
-    Converts a list to a string of comma seperated values
-    """
-    return ', '.join(data)
 
 
 def get_tag_by_name(name: str):
