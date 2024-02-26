@@ -5,18 +5,10 @@ from importlib import import_module
 from pathlib import Path
 
 from scripts.helpers.civitai_utils import model_info_query
-from scripts.globals import out
+from scripts.helpers.tag_manager import write_files_by_network, append_files_by_network
+from scripts.globals import out, networks
 
 from modules import paths_internal
-
-
-networks = {
-        "Lora": ["safetensors"],
-        "LyCORIS": ["safetensors"],
-        "embeddings": ["pt", "safetensors"],
-        "hypernetworks": ["pt"],
-        "Stable-diffusion": ["safetensors", "ckpt"],
-    }
 
 
 def import_lora_lycoris():
@@ -79,15 +71,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
             continue
 
         files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
-        for file in files:
-            # Creating and writing to tag files if they don't exist
-            if not os.path.exists(os.path.join(descriptions_path, f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt")):
-                if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
-                    os.mkdir(os.path.join(descriptions_path, f"{network}/"))
-
-                with open(os.path.join(descriptions_path, f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt"), "w",
-                          encoding="utf-8") as f:
-                    f.write(file)
+        write_files_by_network(network, files)
 
 
 def add_civitai_tags(models_path):
@@ -103,6 +87,15 @@ def add_civitai_tags(models_path):
             os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info"))]
         out(f"file_paths_to_write_info={file_paths_to_write_info}")
         paths_and_info = model_info_query(file_paths_to_write_info)
+        paths_and_tags = []
+        for path, info in paths_and_info:
+            tags = ""
+            for tag in info["tags"]:
+                tags += f"{tag},"
+
+            paths_and_tags.append((path, tags[:-1]))
+
+        append_files_by_network(network, paths_and_tags)
 
 
 def get_or_create_tags_file(base_path, filename):

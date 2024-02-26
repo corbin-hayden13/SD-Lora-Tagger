@@ -138,14 +138,14 @@ def query_model_info(file_path):
 
     except KeyError:  # Failed query
         out(f"Failed to retrieve model info for {file_path}")
-        return file_path, []
+        return file_path, {}
 
     model_info = request_civit_api(f"{api_urls['model_id']}{model_id}")
     try:
         return file_path, model_info
     except KeyError:
         out(f"Failed to retrieve tags for {file_path}")
-        return file_path, []
+        return file_path, {}
 
 
 def model_info_query(file_paths):

@@ -25,6 +25,13 @@ using_sd_next = parser.description is not None and parser.description == "SD.Nex
 
 """ Other """
 hide_nsfw_networks_key = "sd_lora_tagger_hide_nsfw_extra_networks"
+networks = {
+    "Lora": ["safetensors"],
+    "LyCORIS": ["safetensors"],
+    "embeddings": ["pt", "safetensors"],
+    "hypernetworks": ["pt"],
+    "Stable-diffusion": ["safetensors", "ckpt"],
+}
 
 
 def update_hide_nsfw(extras=None):
