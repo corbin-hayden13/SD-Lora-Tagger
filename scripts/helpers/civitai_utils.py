@@ -3,7 +3,7 @@ import json
 import os
 import io
 import hashlib
-import time
+import glob
 from fake_useragent import UserAgent
 
 from modules.shared import cmd_opts, opts
@@ -12,7 +12,7 @@ from scripts.helpers.tag_manager import append_files_by_network
 from scripts.helpers.utils import make_network_path
 
 
-api_urls = {
+api_endpoints = {
     "model_hash": "https://civitai.com/api/v1/model-versions/by-hash/",
     "model_id": "https://civitai.com/api/v1/models/",
 }
@@ -134,7 +134,7 @@ def gen_sha256(file_path):
 
 def query_model_info(file_path):
     model_hash = gen_sha256(file_path)
-    model_info = request_civit_api(f"{api_urls['model_hash']}{model_hash}")
+    model_info = request_civit_api(f"{api_endpoints['model_hash']}{model_hash}")
     try:
         model_id = model_info["modelId"]
 
@@ -142,7 +142,7 @@ def query_model_info(file_path):
         out(f"Failed to retrieve model info for {file_path}")
         return file_path, {}
 
-    model_info = request_civit_api(f"{api_urls['model_id']}{model_id}")
+    model_info = request_civit_api(f"{api_endpoints['model_id']}{model_id}")
     try:
         return file_path, model_info
     except KeyError:
@@ -169,7 +169,8 @@ def add_civitai_tags():
             out(f"No folder for {network} found in models directory")
             continue
 
-        files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
+        files = [file for file in glob.glob(path, recursive=True)
+                 if os.path.splitext(file)[1].lstrip(".") in networks[network]]
         file_paths_to_write_info = [os.path.join(path, file) for file in files if not os.path.exists(
             os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info"))]
         out(f"file_paths_to_write_info={file_paths_to_write_info}")
@@ -182,7 +183,7 @@ def add_civitai_tags():
                     tags += f"{tag},"
 
             except KeyError:
-                pass
+                continue
 
             paths_and_tags.append((path, tags[:-1]))
 
