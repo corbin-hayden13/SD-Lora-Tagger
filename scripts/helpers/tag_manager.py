@@ -4,6 +4,7 @@ import re
 
 from scripts.helpers.paths import tags_path, ui_config_path, ui_config_debug
 from scripts.helpers.utils import csv_to_list, list_to_csv
+from scripts.globals import network_descriptions_path
 
 class Tag(object):
     name: str
@@ -53,11 +54,13 @@ def update_cache():
 
 
 def get_or_create_tags_file() -> str:
+    if not os.path.isdir(network_descriptions_path):
+        os.mkdir(network_descriptions_path)
     if not os.path.exists(tags_path):
         print('SD-Lora-Tagger: Tags file did not exist, creating one...')
         with open(tags_path, 'w', encoding='utf-8') as f:
             try:
-                js = json.dumps([Tag(name='tag', description='An example tag to get you started', models=[]).toJSON()])
+                js = json.dumps([Tag(name='tag', description='An example tag to get you started', models=['my_model']).toJSON()])
                 f.write(js)
                 return js
             except FileNotFoundError as e:
@@ -106,6 +109,7 @@ def add_tag(new_tag: Tag = None, index = 0):
     Adds a new tag at the given index (default: 0), creates a new tag using default values if 'new_tag' is not provided.
     """
     if new_tag is not None:
+        new_tag.name = avoid_duplicate(new_tag.name)
         tags.insert(index, new_tag)
         return to_dataframe()
 
@@ -174,10 +178,15 @@ def to_dataframe(data: list[Tag] = None):
     return output
 
 
-def get_tagged_models() -> list[str]:
+def get_tagged_models(data: list[list[str]] = None) -> list[str]:
+    if data is None:
+        data = to_dataframe()
+    
     models = []
-    for tag in tags:
-        for model in tag.models:
+    for row in data:
+        for model in csv_to_list(row[2]):
+            if str(model).lstrip() == '':
+                continue
             if model not in models:
                 models.append(model)
     return models

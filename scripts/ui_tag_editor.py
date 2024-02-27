@@ -15,8 +15,12 @@ class TagEditorUI():
 
     def save(self, *args):
         if args[0]:
-            return self.toggle_component(False), self.api.save(args[1])
-        return self.toggle_component(True), gr.update(value=args[1])
+            self.api.save(args[1])
+            return self.toggle_component(False)
+        return self.toggle_component(True)
+    
+    def save_manual(self, *args):
+        return self.toggle_component(False), self.api.save(args[0])
     
 
     def remove_row(self):
@@ -66,13 +70,13 @@ class TagEditorUI():
                             print(f'DATAFRAME ROWS: {frame.row_count[0]}')
                             add_btn.click(fn=self.add_row, outputs=[frame, rem_btn])
                             rem_btn.click(fn=lambda _: self.remove_row(), outputs=[frame, rem_btn])
-                            save_btn.click(fn=self.save, inputs=[gr.Checkbox(True, visible=False), frame], outputs=[save_btn, frame])
+                            save_btn.click(fn=self.save_manual, inputs=[frame], outputs=[save_btn, frame])
                             save_chk.change(fn=lambda val: self.toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
 
                             # This needs some attention. Currently it will never be completely updated without passing
                             # in the dataframe as an input, which results in not being able to retrieve it's value
-                            frame.change(fn=self.save, inputs=[save_chk, frame], outputs=[save_btn, frame])
+                            frame.change(fn=self.save, inputs=[save_chk, frame], outputs=[save_btn])
 
-                            search_txt.input(fn=lambda text:self.api.search(text), inputs=[search_txt], outputs=[frame])
-                            sort_dropdown.input(fn=lambda method: self.api.sort(method), inputs=[sort_dropdown], outputs=[frame])
+                            search_txt.input(fn=self.api.search, inputs=[search_txt], outputs=[frame])
+                            sort_dropdown.input(fn=self.api.sort, inputs=[sort_dropdown], outputs=[frame])
         return [(sd_lora_tagger, "Tag Editor", "sd_lora_tagger")]

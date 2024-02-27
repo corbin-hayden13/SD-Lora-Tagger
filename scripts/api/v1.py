@@ -1,3 +1,4 @@
+from .base import DisplayMethod
 from scripts.api.base import TagManagerAPI
 from scripts.helpers.utils import csv_to_list, list_to_csv
 
@@ -6,13 +7,13 @@ class TagManagerAPIv1(TagManagerAPI):
     from typing import Literal
 
     name = "TagManagerAPI v1"
-    first_call = True
-
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.sort_methods = ['Alphabetically', '# Tags'] if self.display_method == 1 else ['Alphabetically', '# Models'] 
+    first_call = True       
     
+
+    def set_display_method(self, display_method: DisplayMethod):
+        super().set_display_method(display_method)
+        self.sort_methods = ['Alphabetically', '# Tags'] if self.display_method == 1 else ['Alphabetically', '# Models'] 
+
 
     def read_all_tags(self) -> list[list[str]]:
         if self.first_call:
@@ -56,13 +57,15 @@ class TagManagerAPIv1(TagManagerAPI):
             if self.display_method == 0:
                 return base_data
             if self.display_method == 1:
-                return self.__read_to_model_display()
-            print('you should not be here')
+                return self.__read_to_model_display(base_data)
+            
         if operation == 'write':
             if self.display_method == 0:
                 return base_data
             if self.display_method == 1:
                 return self.__write_from_model_display(base_data)
+        
+        raise NotImplementedError()
 
 
     def get_headers(self) -> list[str]:
@@ -72,12 +75,12 @@ class TagManagerAPIv1(TagManagerAPI):
             return ['Model', ' ', 'Tags']
 
 
-    def __read_to_model_display(self):
+    def __read_to_model_display(self, data: list[list[str]]):
         """
         Converts from tag display to model display
         """
         result = []
-        models = self.tm.get_tagged_models()
+        models = self.tm.get_tagged_models(data)
         for model in models:
             result.append([model, '', list_to_csv(self.tm.get_tags_by_model(model))])
         return result
@@ -118,4 +121,4 @@ class TagManagerAPIv1(TagManagerAPI):
     
 
     def __sort_by_count(self, data: list[list[str]]) -> list[list[str]]:
-        return sorted(data, key=lambda x: len(csv_to_list(x[2])))
+        return sorted(data, key=lambda x: len(csv_to_list(x[2])), reverse=True)
