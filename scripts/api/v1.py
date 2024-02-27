@@ -88,21 +88,25 @@ class TagManagerAPIv1(TagManagerAPI):
         Converts from model display to tag display
         """
         buffer = {}
-        for item in data:
-            if item == '':
+        for row in data:
+            if row[0] == '' or row[0] is None:
                 continue
-            tags = csv_to_list(item[2])
+            tags = csv_to_list(row[2])
             for tag in tags:
                 obj = self.tm.get_tag_by_name(tag)
                 if obj is None:
-                    obj = self.tm.Tag(name=tag, models=[item[0]])
+                    obj = self.tm.Tag(name=tag, models=[row[0]])
                     self.tm.add_tag(new_tag=obj)
-                    continue
+
                 try:
-                    buffer[obj].append(item[0])
+                    buffer[obj].append(row[0])
                 except KeyError:
-                    buffer[obj] = [item[0]]
-            
+                    buffer[obj] = [row[0]]
+        
+        for cached_tag in self.tm.tags:
+            if cached_tag not in buffer.keys():
+                buffer[cached_tag] = []
+
         for tag_object, models in buffer.items():
             tag_object.models = models
 
