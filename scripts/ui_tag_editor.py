@@ -39,8 +39,10 @@ class TagEditorUI():
                             search_txt = gr.Textbox(placeholder="Search...", scale=20, show_label=False)
                             
                         with gr.Row():
-                            save_btn = gr.Button(value="Save", scale=2, interactive=False)
-                            save_chk = gr.Checkbox(label="Auto Save", scale=20)
+                            sort_dropdown = gr.Dropdown(self.api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
+                            save_btn = gr.Button(value="Save", scale=3, interactive=False)
+                            save_chk = gr.Checkbox(label="Auto Save", scale=2)
+                            gr.Column(scale=16)
                             save_btn.update(interactive=False)
                                 
                             
@@ -66,4 +68,5 @@ class TagEditorUI():
                             frame.change(fn=self.save, inputs=[save_chk, frame], outputs=[save_btn, frame])
 
                             search_txt.input(fn=lambda text:self.api.search(text), inputs=[search_txt], outputs=[frame])
+                            sort_dropdown.input(fn=lambda method: self.api.sort(method), inputs=[sort_dropdown], outputs=[frame])
         return [(sd_lora_tagger, "Tag Editor", "sd_lora_tagger")]
