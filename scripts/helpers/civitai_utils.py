@@ -7,7 +7,7 @@ import time
 from fake_useragent import UserAgent
 
 from modules.shared import cmd_opts, opts
-from scripts.globals import out, networks
+from scripts.globals import out, networks, model_dirs
 from scripts.helpers.tag_manager import append_files_by_network
 from scripts.helpers.utils import make_network_path
 
@@ -163,7 +163,8 @@ def model_info_query(file_paths):
 
 def add_civitai_tags():
     for network in networks:
-        path = make_network_path(network)
+        #path = make_network_path(network)
+        path = model_dirs[network]
 
         if not os.path.exists(path):
             out(f"No folder for {network} found in models directory")

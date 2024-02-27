@@ -2,7 +2,7 @@ import json
 import os
 
 import modules.scripts as scripts
-from modules.shared import opts
+from modules.shared import opts, models_path, cmd_opts
 from modules.cmd_args import parser
 
 
@@ -15,8 +15,17 @@ def out(msg):
 
 """ Paths """
 lora_tagger_dir = scripts.basedir()
-models_dir = './models'
+models_dir = models_path
 network_descriptions_path = os.path.join(lora_tagger_dir, "network_descriptions")
+
+# Used in accordance to https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/modules/cmd_args.py
+model_dirs = {
+    "Lora": cmd_opts.lora_dir,
+    "LyCORIS": os.path.join(models_dir, 'LyCORIS'),
+    "embeddings": cmd_opts.embeddings_dir,
+    "hypernetworks": cmd_opts.hypernetwork_dir,
+    "Stable-diffusion": cmd_opts.ckpt_dir
+}
 
 """ Options and Flags """
 js_overrides = ["sdNextExtraNetworks.js", "automatic1111ExtraNetworks.js"]
