@@ -22,7 +22,10 @@ class TagManagerAPIv1(TagManagerAPI):
         return self.format_tag_data('read', self.tm.search(search_term))
     
     def add_row(self, index: int = -1) -> list[list[str]]:
-        return self.format_tag_data('read', self.tm.add_tag())
+        tag: self.tm.Tag = None
+        if self.display_method == 1:
+            tag = self.tm.Tag(name='placeholder', description='', models=['my_model'])
+        return self.format_tag_data('read', self.tm.add_tag(tag))
     
     def del_row(self, index: int = -1) -> list[list[str]]:
         return self.format_tag_data('read', self.tm.remove_tag(index))
