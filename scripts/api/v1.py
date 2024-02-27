@@ -87,6 +87,7 @@ class TagManagerAPIv1(TagManagerAPI):
         """
         Converts from model display to tag display
         """
+        buffer = {}
         for item in data:
             if item == '':
                 continue
@@ -97,14 +98,20 @@ class TagManagerAPIv1(TagManagerAPI):
                     obj = self.tm.Tag(name=tag, models=[item[0]])
                     self.tm.add_tag(new_tag=obj)
                     continue
-                if item[0] not in obj.models:
-                    obj.models.append(item[0])
+                try:
+                    buffer[obj].append(item[0])
+                except KeyError:
+                    buffer[obj] = [item[0]]
+            
+        for tag_object, models in buffer.items():
+            tag_object.models = models
+
         return self.tm.to_dataframe()
     
 
     def __sort_alphabetically(self, data: list[list[str]], col = 0) -> list[list[str]]:
         return sorted(data, key=lambda x: x[col])
     
-    
+
     def __sort_by_count(self, data: list[list[str]]) -> list[list[str]]:
         return sorted(data, key=lambda x: len(csv_to_list(x[2])))
