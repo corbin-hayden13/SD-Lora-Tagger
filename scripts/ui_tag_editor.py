@@ -7,15 +7,18 @@ class TagEditorUI():
         self.api = api
         self.api.load_tags()
 
+
     def toggle_component(self, val):
         variant = lambda v: 'primary' if v else 'secondary'
         return gr.update(interactive=val, variant=variant(val))
     
+
     def save(self, *args):
         if args[0]:
             return self.toggle_component(False), self.api.save(args[1])
         return self.toggle_component(True), gr.update(value=args[1])
     
+
     def remove_row(self):
         update = self.toggle_component(True)
         data = self.api.del_row()
@@ -24,8 +27,10 @@ class TagEditorUI():
             
         return (data, update)
     
+
     def add_row(self):
         return self.api.add_row(), self.toggle_component(True)
+
 
     def on_ui_tabs(self):
         print(f'SD_Lora_Tagger: Loading UI (using {self.api.name})')
@@ -38,6 +43,7 @@ class TagEditorUI():
                             rem_btn = gr.Button(value="Remove", variant='primary', scale=3)
                             search_txt = gr.Textbox(placeholder="Search...", scale=20, show_label=False)
                             
+            
                         with gr.Row():
                             sort_dropdown = gr.Dropdown(self.api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
                             save_btn = gr.Button(value="Save", scale=3, interactive=False)
