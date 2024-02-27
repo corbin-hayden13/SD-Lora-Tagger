@@ -158,7 +158,6 @@ def model_info_query(file_paths):
     for file in file_paths:
         paths_and_info.append(query_model_info(file))
 
-    out(f"paths_and_info =>\n{[list(info.keys()) for _, info in paths_and_info]}")
     return paths_and_info
 
 
@@ -178,8 +177,12 @@ def add_civitai_tags():
         paths_and_tags = []
         for path, info in paths_and_info:
             tags = ""
-            for tag in info["tags"]:
-                tags += f"{tag},"
+            try:
+                for tag in info["tags"]:
+                    tags += f"{tag},"
+
+            except KeyError:
+                pass
 
             paths_and_tags.append((path, tags[:-1]))
 
