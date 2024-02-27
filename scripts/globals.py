@@ -21,7 +21,7 @@ network_descriptions_path = os.path.join(lora_tagger_dir, "network_descriptions"
 # Used in accordance to https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/modules/cmd_args.py
 model_dirs = {
     "Lora": cmd_opts.lora_dir,
-    "LyCORIS": os.path.join(models_dir, 'LyCORIS'),
+    "LyCORIS": cmd_opts.lyco_dir,
     "embeddings": cmd_opts.embeddings_dir,
     "hypernetworks": cmd_opts.hypernetwork_dir,
     "Stable-diffusion": cmd_opts.ckpt_dir
