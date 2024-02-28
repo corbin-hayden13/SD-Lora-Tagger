@@ -14,7 +14,8 @@ def out(msg):
 
 
 def splitext(path):
-    return path[:path.rfind(".")]
+    last_period_ind = path.rfind(".")
+    return path[:last_period_ind], path[last_period_ind:]
 
 
 """ Paths """
