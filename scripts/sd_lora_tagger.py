@@ -5,23 +5,14 @@ import json
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
 from modules.script_callbacks import callback_map
-from modules.cmd_args import parser
 from modules.ui_extra_networks import extra_pages
 
 from scripts.helpers.utils import init_extra_network_tags, clear_js_overrides
 from scripts.helpers.registration_override import register_all
 from scripts.edit_tags_ui import on_ui_tabs, on_ui_settings, populate_all_tags
-from scripts.globals import hide_nsfw
+from scripts.globals import lora_tagger_dir, models_dir, using_sd_next, js_overrides, override_before_ui, hide_nsfw, out
 
 
-txt2img_extras_refresh_comp = None
-lora_tagger_dir = scripts.basedir()
-config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
-models_dir = './models'
-override_before_ui = ["lora_script.py", "lycoris_script.py", "ui_extra_networks.py"]
-
-using_sd_next = parser.description is not None and parser.description == "SD.Next"
-js_overrides = ["sdNextExtraNetworks.js", "automatic1111ExtraNetworks.js"]
 destination_path = os.path.join(lora_tagger_dir, f"javascript/{js_overrides[0]}") if using_sd_next\
               else os.path.join(lora_tagger_dir, f"javascript/{js_overrides[1]}")
 source_path = os.path.join(lora_tagger_dir, f"js_staging/{js_overrides[0]}") if using_sd_next\
@@ -37,7 +28,7 @@ try:
 
     shutil.copy(source_path, destination_path)
 except Exception as e:
-    print(f"SD Lora Tagger: using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
+    out(f"using_sd_next={using_sd_next}: could not move {source_path} to {destination_path}")
 
 init_extra_network_tags(models_dir, os.path.join(lora_tagger_dir, "network_descriptions/"))
 populate_all_tags()

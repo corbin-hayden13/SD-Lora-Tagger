@@ -4,7 +4,8 @@ import gradio as gr
 
 import modules.shared as shared
 
-from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path
+from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path, out, splitext
+from scripts.helpers.civitai_utils import add_civitai_tags
 
 
 global all_tags, all_txt_files
@@ -14,12 +15,12 @@ def populate_all_tags():
     global all_tags, all_txt_files
 
     txt_pattern = os.path.join(f"{network_descriptions_path}/**/*.txt")
-    print(f"SD Lora Tagger UI: txt_pattern={txt_pattern}")
+    out(f"txt_pattern={txt_pattern}")
     all_txt_files = glob.glob(txt_pattern, recursive=True)
     all_tags = {}
 
     for file in all_txt_files:
-        file_name = os.path.basename(file).split(".")[0]
+        file_name = splitext(os.path.basename(file))[0]
 
         with open(file, "r", encoding='utf-8') as f:
             file_data = f.read()
@@ -43,10 +44,6 @@ def save_text(*args):
 
     return [gr.Dropdown.update(choices=list(all_tags.keys())),
             gr.Textbox.update(value=tags)]
-
-
-def refresh_txt_files():
-    pass
 
 
 def search_extra_networks(*args):
@@ -89,15 +86,22 @@ def search_extra_networks(*args):
 
 def on_ui_tabs():
     update_hide_nsfw()
-    print(f"SD Lora Tagger: hide_nsfw={hide_nsfw}")
+    out(f"hide_nsfw={hide_nsfw}")
 
     with gr.Blocks() as sd_lora_tagger:
-        search_bar = gr.Dropdown(label="Search By File Name or Tags", multiselect=True,
-                                 choices=list(all_tags.keys()))
+        with gr.Row():
+            with gr.Column(scale=8):
+                search_bar = gr.Dropdown(label="Search By File Name or Tags", multiselect=True,
+                                         choices=list(all_tags.keys()))
+
+            with gr.Column(scale=1):
+                civitai_button = gr.Button(value="Add Civitai Tags", elem_id=f"add_civitai_tags")
+                civitai_button.click(fn=add_civitai_tags)
+
         with gr.Column():
             file_rows = [search_bar]
             for txt_file in all_txt_files:
-                file_name = os.path.basename(txt_file).split(".")[0]
+                file_name = splitext(os.path.basename(txt_file))[0]
 
                 with open(txt_file, "r", encoding='utf-8') as f:
                     file_data = f.read()

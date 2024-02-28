@@ -3,6 +3,10 @@ from glob import glob
 import sys
 from importlib import import_module
 from pathlib import Path
+
+from scripts.helpers.tag_manager import write_files_by_network
+from scripts.globals import out, networks, models_dir, splitext
+
 from modules import paths_internal
 
 
@@ -22,17 +26,24 @@ def import_lora_lycoris():
         lora = import_module("lora")
         extra_networks_lora = import_module("extra_networks_lora")
     except ModuleNotFoundError:
-        print("The Lora extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+        out("The Lora extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
 
     try:
         lycoris = import_module("lycoris")
     except ModuleNotFoundError:
-        print("The LyCORIS extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
+        out("The LyCORIS extension is not installed in the \"extensions-builtin\" file path, cannot overwrite")
 
     return lora, extra_networks_lora, lycoris
 
 
 lora, extra_networks_lora, lycoris = import_lora_lycoris()
+
+
+def make_network_path(network_type):
+    # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
+    if network_type == "embeddings" and not os.path.exists(os.path.join(models_dir, f"{network_type}/")):
+        return "./embeddings"
+    else: return os.path.join(models_dir, f"{network_type}/")
 
 
 def init_extra_network_tags(models_path, descriptions_path, included_networks=None):
@@ -43,13 +54,6 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
     :param included_networks: A dictionary of str: list as "network_folder_name": ["desired","file", "extensions"].  If not None, will extend existing known file extensions with provided ones
     :return: None
     """
-    networks = {
-        "Lora": ["safetensors"],
-        "LyCORIS": ["safetensors"],
-        "embeddings": ["pt", "safetensors"],
-        "hypernetworks": ["pt"],
-        "Stable-diffusion": ["safetensors", "ckpt"],
-    }
 
     if included_networks is not None:
         for key in included_networks:
@@ -59,28 +63,18 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                 networks[key] = included_networks[key]
 
     for network in networks:
-        # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
-        if network == "embeddings" and not os.path.exists(os.path.join(models_path, f"{network}/")):
-            path = "./embeddings"
-        else: path = os.path.join(models_path, f"{network}/")
+        path = make_network_path(network)
 
         if not os.path.exists(path):
-            print(f"SD Lora Tagger: No folder for {network} found in models directory")
+            out(f"No folder for {network} found in models directory")
             continue
 
-        files = [file.split(".")[0] for file in os.listdir(path) if file.split(".")[-1] in networks[network]]
-
-        for file in files:
-            if not os.path.exists(os.path.join(descriptions_path, f"{network}/{file}.txt")):
-                if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
-                    os.mkdir(os.path.join(descriptions_path, f"{network}/"))
-
-                with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w") as f:
-                    f.write(file)
+        files = [file for file in os.listdir(path) if splitext(file)[1].lstrip(".") in networks[network]]
+        write_files_by_network(network, files)
 
 
 def get_or_create_tags_file(base_path, filename):
-    path = os.path.join(base_path, f"{os.path.basename(filename).split('.')[0]}.txt")
+    path = os.path.join(base_path, f"{splitext(os.path.basename(filename))[0]}.txt")
     try:
         with open(path, 'r', encoding='utf-8') as f:
             search_terms = f.read()
@@ -91,7 +85,7 @@ def get_or_create_tags_file(base_path, filename):
             Path(base_path).mkdir(parents=True)  # All directories might not exist
 
         with open(path, 'w', encoding='utf-8') as f:
-            search_terms = os.path.basename(filename).split('.')[0]
+            search_terms = splitext(os.path.basename(filename))[0]
             f.write(search_terms)
 
         return search_terms
@@ -107,7 +101,7 @@ def clear_js_overrides(directory):
 
 
 def load_tags(descriptions_path):
-    files = [file for file in glob(os.path.join(descriptions_path, "**/*.txt"), recursive=True) if file.split(".")[-1] == "txt"]
+    files = glob(os.path.join(descriptions_path, "**/*.txt"), recursive=True)
     all_tags = {}
 
     for file in files:

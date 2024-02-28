@@ -7,7 +7,7 @@ from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_netwo
 from modules.textual_inversion.textual_inversion import Embedding
 
 from scripts.helpers.utils import lora, lycoris, extra_networks_lora, get_or_create_tags_file
-from scripts.globals import update_hide_nsfw
+from scripts.globals import update_hide_nsfw, splitext
 
 
 lora_exists = lora is not None
@@ -41,18 +41,18 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                         embedding.filename = os.path.join(root, fn)
                         embeddings.append(embedding)
         for embedding in embeddings:
-            path, _ext = os.path.splitext(embedding.filename)
+            path, _ext = splitext(embedding.filename)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, embedding.filename)
 
             yield_dict = {
-                "name": os.path.splitext(embedding.name)[0],
+                "name": splitext(embedding.name)[0],
                 "filename": embedding.filename,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
                 "search_term": f"{os.path.basename(embedding.filename)} {search_terms}|||{self.extras}",
                 # self.search_terms_from_path(embedding.filename),
-                "prompt": json.dumps(os.path.splitext(embedding.name)[0]),
+                "prompt": json.dumps(splitext(embedding.name)[0]),
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
 
@@ -77,7 +77,7 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
     def list_items(self):
         self.extras = update_hide_nsfw(self.extras)
         for name, path in shared.hypernetworks.items():
-            path, _ext = os.path.splitext(path)
+            path, _ext = splitext(path)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, path)
 
@@ -117,7 +117,7 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
         checkpoint: sd_models.CheckpointInfo
         self.extras = update_hide_nsfw(self.extras)
         for name, checkpoint in sd_models.checkpoints_list.items():
-            path, _ext = os.path.splitext(checkpoint.filename)
+            path, _ext = splitext(checkpoint.filename)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, checkpoint.filename)
 
@@ -161,7 +161,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
     def list_items(self):
         self.extras = update_hide_nsfw(self.extras)
         for name, lora_on_disk in lora.available_loras.items():
-            path, _ext = os.path.splitext(lora_on_disk.filename)
+            path, _ext = splitext(lora_on_disk.filename)
             alias = lora_on_disk.get_alias()
             prompt = (json.dumps(f"<lora:{alias}") + " + " + json.dumps(f':{shared.opts.extra_networks_default_multiplier}') + " + " + json.dumps(">"))
             metadata =  json.dumps(lora_on_disk.metadata, indent=4) if lora_on_disk.metadata else None
@@ -219,7 +219,7 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
     def list_items(self):
         self.extras = update_hide_nsfw(self.extras)
         for index, (name, lyco_on_disk) in enumerate(lycoris.available_lycos.items()):
-            path, ext = os.path.splitext(lyco_on_disk.filename)
+            path, ext = splitext(lyco_on_disk.filename)
             sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, lyco_on_disk.filename)
