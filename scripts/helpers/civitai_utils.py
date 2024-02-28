@@ -7,9 +7,8 @@ import glob
 from fake_useragent import UserAgent
 
 from modules.shared import cmd_opts, opts
-from scripts.globals import out, networks, model_dirs
+from scripts.globals import out, networks, model_dirs, splitext
 from scripts.helpers.tag_manager import append_files_by_network
-from scripts.helpers.utils import make_network_path
 
 
 api_endpoints = {
@@ -82,7 +81,7 @@ def gen_sha256(file_path):
     :param file_path: full file path for model to be hashed
     :return: sha_256 hash as str
     """
-    json_file = os.path.splitext(file_path)[0] + ".json"
+    json_file = splitext(file_path)[0] + ".json"
 
     if os.path.exists(json_file):
         try:
@@ -171,9 +170,9 @@ def add_civitai_tags():
             continue
 
         files = [file for file in glob.glob(path, recursive=True)
-                 if os.path.splitext(file)[1].lstrip(".") in networks[network]]
+                 if splitext(file)[1].lstrip(".") in networks[network]]
         file_paths_to_write_info = [os.path.join(path, file) for file in files if not os.path.exists(
-            os.path.join(path, f"{os.path.splitext(os.path.basename(file))[0]}.civitai.info"))]
+            os.path.join(path, f"{splitext(os.path.basename(file))[0]}.civitai.info"))]
         out(f"file_paths_to_write_info={file_paths_to_write_info}")
         paths_and_info = model_info_query(file_paths_to_write_info)
         paths_and_tags = []

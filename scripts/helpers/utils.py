@@ -5,7 +5,7 @@ from importlib import import_module
 from pathlib import Path
 
 from scripts.helpers.tag_manager import write_files_by_network
-from scripts.globals import out, networks, models_dir
+from scripts.globals import out, networks, models_dir, splitext
 
 from modules import paths_internal
 
@@ -69,7 +69,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
             out(f"No folder for {network} found in models directory")
             continue
 
-        files = [file for file in os.listdir(path) if os.path.splitext(file)[1].lstrip(".") in networks[network]]
+        files = [file for file in os.listdir(path) if splitext(file)[1].lstrip(".") in networks[network]]
         write_files_by_network(network, files)
 
 

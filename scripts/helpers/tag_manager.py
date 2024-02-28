@@ -1,24 +1,24 @@
 import os
 
-from scripts.globals import network_descriptions_path, out
+from scripts.globals import network_descriptions_path, out, splitext
 
 
 def write_tags_by_network(network, file):
     if not os.path.exists(
-            os.path.join(network_descriptions_path, f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt")):
+            os.path.join(network_descriptions_path, f"{network}/{splitext(os.path.basename(file))[0]}.txt")):
         with open(os.path.join(network_descriptions_path,
-                  f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt"), "w", encoding="utf-8") as f:
+                  f"{network}/{splitext(os.path.basename(file))[0]}.txt"), "w", encoding="utf-8") as f:
             f.write(file)
 
 
 def append_tags_by_network(network, file, tags):
     if not os.path.exists(
-            os.path.join(network_descriptions_path, f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt")):
+            os.path.join(network_descriptions_path, f"{network}/{splitext(os.path.basename(file))[0]}.txt")):
         out(f"No such file {file}")
         return
 
     with open(os.path.join(network_descriptions_path,
-                           f"{network}/{os.path.splitext(os.path.basename(file))[0]}.txt"), "a", encoding="utf-8") as f:
+                           f"{network}/{splitext(os.path.basename(file))[0]}.txt"), "a", encoding="utf-8") as f:
         f.write(f",{tags}")
 
 
