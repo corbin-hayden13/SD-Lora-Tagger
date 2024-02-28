@@ -4,7 +4,7 @@ import gradio as gr
 
 import modules.shared as shared
 
-from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path, out
+from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path, out, splitext
 from scripts.helpers.civitai_utils import add_civitai_tags
 
 
@@ -20,7 +20,7 @@ def populate_all_tags():
     all_tags = {}
 
     for file in all_txt_files:
-        file_name = os.path.basename(file).split(".")[0]
+        file_name = os.path.basename(splitext(file)[0])
 
         with open(file, "r", encoding='utf-8') as f:
             file_data = f.read()
