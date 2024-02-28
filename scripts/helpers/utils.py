@@ -74,7 +74,7 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
 
 
 def get_or_create_tags_file(base_path, filename):
-    path = os.path.join(base_path, f"{os.path.basename(filename).split('.')[0]}.txt")
+    path = os.path.join(base_path, f"{splitext(os.path.basename(filename))[0]}.txt")
     try:
         with open(path, 'r', encoding='utf-8') as f:
             search_terms = f.read()
@@ -85,7 +85,7 @@ def get_or_create_tags_file(base_path, filename):
             Path(base_path).mkdir(parents=True)  # All directories might not exist
 
         with open(path, 'w', encoding='utf-8') as f:
-            search_terms = os.path.basename(filename).split('.')[0]
+            search_terms = splitext(os.path.basename(filename))[0]
             f.write(search_terms)
 
         return search_terms
