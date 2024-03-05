@@ -56,6 +56,8 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                 networks[key] = included_networks[key]
 
     for network in networks:
+        if os.path.exists(os.path.join(descriptions_path, f"{network}_OLD/")):
+            continue
         # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
         if network == "embeddings" and not os.path.exists(os.path.join(models_path, f"{network}/")):
             path = "./embeddings"

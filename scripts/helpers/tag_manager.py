@@ -1,8 +1,9 @@
 import json
 import os
 import re
+from typing import Literal
 
-from scripts.helpers.paths import tags_path, ui_config_path, ui_config_debug
+from scripts.helpers.paths import tags_path, tags_path_d, ui_config_path, ui_config_debug
 from scripts.helpers.utils import csv_to_list, list_to_csv
 from scripts.globals import network_descriptions_path
 
@@ -102,6 +103,20 @@ def save_tags():
     with open(tags_path, 'w', encoding='utf-8') as f:
         f.write(js)
 
+def save_tags_debug():
+    """
+    Saves all tags to JSON
+    """
+    # This feels very wrong, probably worth replacing
+    data = []
+    for tag in tags:
+        tag.name = avoid_duplicate(tag.name, exclude_current=True)
+        data.append(tag.toJSON())
+    
+    js = json.dumps(data, indent=4)
+
+    with open(tags_path_d, 'w', encoding='utf-8') as f:
+        f.write(js)
 
 
 def add_tag(new_tag: Tag = None, index = 0):
@@ -119,6 +134,39 @@ def add_tag(new_tag: Tag = None, index = 0):
     tags.insert(index, tag)
     return to_dataframe()
 
+
+def update_tag(tag_name: str, description: str = None, models: list[str] = None, models_update_method: Literal['overwrite', 'append'] = 'append'):
+    """
+    Updates a tag based on the given parameters.
+
+    #### Parameters:
+    models_update_method - Whether to overwrite models, or append a new list over already existing models
+    """
+    tag: Tag = get_tag_by_name(tag_name)
+    if tag is None:
+        print(f"Tag with name '{tag_name}' not found, creating a new one...")
+        tag = Tag(name=tag_name, models=models)
+        tags.append(tag)
+        return
+
+    if description is not None:
+        tag.description = description
+    
+    #print(f"{tag}: {models}")
+
+    if models is not None:
+        if models_update_method == 'overwrite':
+            tag.models = models
+        if models_update_method == 'append':
+            print(f"----{tag_name}----")
+            print(models)
+            print(tag.models)
+            for model in models:
+                if model in tag.models:
+                    continue
+                tag.models.append(model)
+    
+    return tag
 
 def remove_tag(index = -1):
     """

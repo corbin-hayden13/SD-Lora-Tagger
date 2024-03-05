@@ -14,7 +14,7 @@ global all_tags, all_txt_files
 def populate_all_tags():
     global all_tags, all_txt_files
 
-    txt_pattern = os.path.join(f"{network_descriptions_path}/**/*.txt")
+    txt_pattern = os.path.join(f"{network_descriptions_path}\\**[!_OLD]\\*.txt") # Include all subdirectories, except for ones ending in '_OLD'
     print(f"SD Lora Tagger UI: txt_pattern={txt_pattern}")
     all_txt_files = glob.glob(txt_pattern, recursive=True)
     all_tags = {}

@@ -34,6 +34,7 @@ model_description_dirs = {
 }
 
 tags_path = os.path.join(description_path, "tags.json")
+tags_path_d = os.path.join(description_path, "tags_debug.json")
 
 def path_from_model_type(model_type: ModelType):
     return model_description_dirs[model_type]
