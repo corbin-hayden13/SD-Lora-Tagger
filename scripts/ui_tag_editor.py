@@ -1,11 +1,14 @@
 import gradio as gr
-from scripts.api.base import TagManagerAPI
+from scripts.api.tag_api import TagManagerAPI
+from scripts.api.extras_api import ExtrasAPI
 
 class TagEditorUI():
-    api: TagManagerAPI
-    def __init__(self, api: TagManagerAPI):
-        self.api = api
-        self.api.load_tags()
+    tag_api: TagManagerAPI
+    extras_api: ExtrasAPI
+    def __init__(self, api: TagManagerAPI, extras: ExtrasAPI = None):
+        self.tag_api = api
+        self.extras_api = extras
+        self.tag_api.load_tags()
 
 
     def toggle_component(self, val):
@@ -15,17 +18,17 @@ class TagEditorUI():
 
     def save(self, *args):
         if args[0]:
-            self.api.save(args[1])
+            self.tag_api.save(args[1])
             return self.toggle_component(False)
         return self.toggle_component(True)
     
     def save_manual(self, *args):
-        return self.toggle_component(False), self.api.save(args[0])
+        return self.toggle_component(False), self.tag_api.save(args[0])
     
 
     def remove_row(self):
         update = self.toggle_component(True)
-        data = self.api.del_row()
+        data = self.tag_api.del_row()
         if len(data) == 0:
             update = self.toggle_component(False)
             
@@ -33,11 +36,11 @@ class TagEditorUI():
     
 
     def add_row(self):
-        return self.api.add_row(), self.toggle_component(True)
+        return self.tag_api.add_row(), self.toggle_component(True)
 
 
     def on_ui_tabs(self):
-        print(f'SD_Lora_Tagger: Loading UI (using {self.api.name})')
+        print(f'SD_Lora_Tagger: Loading UI (using {self.tag_api.name})')
         with gr.Blocks() as sd_lora_tagger:
             with gr.Column():
                 with gr.Row():
@@ -49,22 +52,25 @@ class TagEditorUI():
                             
             
                         with gr.Row():
-                            sort_dropdown = gr.Dropdown(self.api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
+                            sort_dropdown = gr.Dropdown(self.tag_api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
                             save_btn = gr.Button(value="Save", scale=3, interactive=False)
                             save_chk = gr.Checkbox(label="Auto Save", scale=2)
                             gr.Column(scale=16)
                             save_btn.update(interactive=False)
-                                
+
+                        if self.extras_api is not None:
+                            with gr.Row():
+                                self.extras_api.create()
                             
                         with gr.Row():
-                            data = self.api.read_all_tags()
+                            data = self.tag_api.read_all_tags()
                             frame = gr.Matrix(
                                 data,
-                                headers=self.api.get_headers(),
+                                headers=self.tag_api.get_headers(),
                                 datatype=['str', 'str', 'str'],
                                 row_count=(len(data), 'dynamic'),
                                 col_count=(3, 'fixed'),
-                                height=650, # fit perfectly on my screen, might be worth introducing an option for this?
+                                height=522, # fit perfectly on my screen, might be worth introducing an option for this?
                                 interactive=True
                             )
                             print(f'DATAFRAME ROWS: {frame.row_count[0]}')
@@ -77,6 +83,8 @@ class TagEditorUI():
                             # in the dataframe as an input, which results in not being able to retrieve it's value
                             frame.change(fn=self.save, inputs=[save_chk, frame], outputs=[save_btn])
 
-                            search_txt.input(fn=self.api.search, inputs=[search_txt], outputs=[frame])
-                            sort_dropdown.input(fn=self.api.sort, inputs=[sort_dropdown], outputs=[frame])
+                            search_txt.input(fn=self.tag_api.search, inputs=[search_txt], outputs=[frame])
+                            sort_dropdown.input(fn=self.tag_api.sort, inputs=[sort_dropdown], outputs=[frame])
+                            if self.extras_api is not None:
+                                self.extras_api.bind_table(frame)
         return [(sd_lora_tagger, "Tag Editor", "sd_lora_tagger")]

@@ -1,5 +1,4 @@
-from .base import DisplayMethod
-from scripts.api.base import TagManagerAPI
+from scripts.api.tag_api import TagManagerAPI, DisplayMethod
 from scripts.helpers.utils import csv_to_list, list_to_csv
 
 class TagManagerAPIv1(TagManagerAPI):

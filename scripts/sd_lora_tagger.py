@@ -12,7 +12,8 @@ from scripts.helpers.utils import init_extra_network_tags, clear_js_overrides
 from scripts.helpers.registration_override import register_all
 from scripts.edit_tags_ui import populate_all_tags
 from scripts.ui_tag_editor import TagEditorUI
-from scripts.api.v1 import TagManagerAPIv1
+from scripts.api.tag_v1 import TagManagerAPIv1
+from scripts.api.extras_v1 import ExtrasAPIv1
 from scripts.helpers.paths import destination_path, source_path, models_dir, using_sd_next, model_description_dirs, description_path
 from scripts.edit_tags_ui import on_ui_settings, populate_all_tags
 from scripts.globals import hide_nsfw
@@ -80,7 +81,8 @@ class LoraTagger(scripts.Script):
 
 
 api = TagManagerAPIv1()
-ui = TagEditorUI(api)
+extras = ExtrasAPIv1()
+ui = TagEditorUI(api, extras)
 api.set_display_method(1)
 
 # Stops Lora, LyCORIS from rendering their own extra_network pages alongside the custom ones
