@@ -7,9 +7,11 @@ import modules.shared as shared
 
 global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
 
-
 hide_nsfw_networks_key = "sd_lora_tagger_hide_nsfw_extra_networks"
+display_mode_key = "sd_lora_tagger_display_mode"
 network_descriptions_path = os.path.join(scripts.basedir(), "network_descriptions")
+
+
 
 # print(f"SD Lora Tagger: network_descriptions_path={network_descriptions_path}")
 

@@ -16,7 +16,7 @@ from scripts.api.tag_v1 import TagManagerAPIv1
 from scripts.api.extras_v1 import ExtrasAPIv1
 from scripts.helpers.paths import destination_path, source_path, models_dir, using_sd_next, model_description_dirs, description_path
 from scripts.edit_tags_ui import on_ui_settings, populate_all_tags
-from scripts.globals import hide_nsfw
+from scripts.globals import hide_nsfw, display_mode_key
 from scripts.helpers.tag_update import update
 from modules import shared
 
@@ -82,10 +82,13 @@ class LoraTagger(scripts.Script):
 
 update()
 
+display_mode_data = int(shared.opts.data[display_mode_key])
+display_mode = display_mode_data if display_mode_data is not None else 0
+
 api = TagManagerAPIv1()
 extras = ExtrasAPIv1()
 ui = TagEditorUI(api, extras)
-api.set_display_method(1)
+api.set_display_method(display_mode)
 
 # Stops Lora, LyCORIS from rendering their own extra_network pages alongside the custom ones
 #   by removing their on_before_ui() callback functions before they're called
