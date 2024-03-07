@@ -59,6 +59,9 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
 
+            if using_sd_next:
+                yield_dict["search_term"] = search_terms
+
             yield yield_dict
 
     def allowed_directories_for_previews(self):
@@ -98,6 +101,9 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
                 "prompt": json.dumps(f"<hypernet:{name}:{shared.opts.extra_networks_default_multiplier}>"),
                 "local_preview": f"{path}.preview.{shared.opts.samples_format}",
             }
+
+            if using_sd_next:
+                yield_dict["search_term"] = search_terms
 
             yield yield_dict
 
@@ -144,6 +150,10 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
                 "local_preview": f"{path}.{shared.opts.samples_format}",
                 "metadata": checkpoint.metadata,
             }
+
+            if using_sd_next:
+                yield_dict["search_term"] = search_terms
+                yield_dict["hash"] = checkpoint.shorthash
 
             yield yield_dict
 
@@ -207,6 +217,10 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 "tags": tags,
             }
 
+            if using_sd_next:
+                yield_dict["search_term"] = search_terms
+                yield_dict["hash"] = lora_on_disk.shorthash
+
             yield yield_dict
 
     def allowed_directories_for_previews(self):
@@ -256,6 +270,9 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
                 "metadata": json.dumps(lyco_on_disk.metadata, indent=4) if lyco_on_disk.metadata else None,
                 "sort_keys": {'default': index, **sort_keys},
             }
+
+            if using_sd_next:
+                yield_dict["search_term"] = search_terms
 
             yield yield_dict
 
