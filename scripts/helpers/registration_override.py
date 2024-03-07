@@ -7,7 +7,7 @@ from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_netwo
 from modules.textual_inversion.textual_inversion import Embedding
 
 from scripts.helpers.utils import lora, lycoris, extra_networks_lora, get_or_create_tags_file
-from scripts.globals import update_hide_nsfw
+from scripts.globals import update_hide_nsfw, using_sd_next
 
 
 lora_exists = lora is not None
@@ -44,6 +44,9 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
             path, _ext = os.path.splitext(embedding.filename)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, embedding.filename)
+            # Required for A111 1.8+
+            if not using_sd_next:
+                search_terms = [search_terms]
 
             yield_dict = {
                 "name": os.path.splitext(embedding.name)[0],
@@ -80,6 +83,9 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
             path, _ext = os.path.splitext(path)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, path)
+            # Required for A111 1.8+
+            if not using_sd_next:
+                search_terms = [search_terms]
 
             yield_dict = {
                 "name": name,
@@ -120,6 +126,9 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
             path, _ext = os.path.splitext(checkpoint.filename)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, checkpoint.filename)
+            # Required for A111 1.8+
+            if not using_sd_next:
+                search_terms = [search_terms]
 
             yield_dict = {
                 "name": checkpoint.name_for_extra,
@@ -150,9 +159,9 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
 
 class LoraPage(ui_extra_networks.ExtraNetworksPage):
     def __init__(self, descriptions_path, extras=None):
-        super().__init__('Lora')
         self.descriptions_path = descriptions_path
         self.extras = extras
+        super().__init__('Lora')
 
     def refresh(self):
         self.extras = update_hide_nsfw(self.extras)
@@ -178,6 +187,9 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
             # shared.log.debug(f'Lora: {path}: name={name} alias={alias} tags={tags}')
 
             search_terms = get_or_create_tags_file(self.descriptions_path, lora_on_disk.filename)
+            # Required for A111 1.8+
+            if not using_sd_next:
+                search_terms = [search_terms]
 
             yield_dict = {
                 "name": name,
@@ -223,6 +235,9 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
             sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
 
             search_terms = get_or_create_tags_file(self.descriptions_path, lyco_on_disk.filename)
+            # Required for A111 1.8+
+            if not using_sd_next:
+                search_terms = [search_terms]
 
             yield_dict = {
                 "name": name,
