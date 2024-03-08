@@ -5,13 +5,12 @@ import json
 import modules.scripts as scripts
 from modules.scripts import script_callbacks
 from modules.script_callbacks import callback_map
-from modules.cmd_args import parser
 from modules.ui_extra_networks import extra_pages
 
 from scripts.helpers.utils import init_extra_network_tags, clear_js_overrides
 from scripts.helpers.registration_override import register_all
 from scripts.edit_tags_ui import on_ui_tabs, on_ui_settings, populate_all_tags
-from scripts.globals import hide_nsfw
+from scripts.globals import hide_nsfw, using_sd_next
 
 
 txt2img_extras_refresh_comp = None
@@ -20,7 +19,6 @@ config_path = os.path.join(lora_tagger_dir, r"scripts\helpers\config.txt")
 models_dir = './models'
 override_before_ui = ["lora_script.py", "lycoris_script.py", "ui_extra_networks.py"]
 
-using_sd_next = parser.description is not None and parser.description == "SD.Next"
 js_overrides = ["sdNextExtraNetworks.js", "automatic1111ExtraNetworks.js"]
 destination_path = os.path.join(lora_tagger_dir, f"javascript/{js_overrides[0]}") if using_sd_next\
               else os.path.join(lora_tagger_dir, f"javascript/{js_overrides[1]}")

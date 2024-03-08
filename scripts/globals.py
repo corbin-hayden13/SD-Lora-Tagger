@@ -3,6 +3,7 @@ import os
 
 import modules.scripts as scripts
 import modules.shared as shared
+from modules.cmd_args import parser
 
 
 global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
@@ -10,6 +11,8 @@ global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
 
 hide_nsfw_networks_key = "sd_lora_tagger_hide_nsfw_extra_networks"
 network_descriptions_path = os.path.join(scripts.basedir(), "network_descriptions")
+
+using_sd_next = parser.description is not None and parser.description == "SD.Next"
 
 print(f"SD Lora Tagger: network_descriptions_path={network_descriptions_path}")
 
