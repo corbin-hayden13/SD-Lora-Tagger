@@ -1,13 +1,13 @@
 from enum import Enum
 
-class DisplayMethod(Enum):
+class DisplayMode(Enum):
     TAG = 0
     MODEL = 1
 
 class TagManagerAPI():
     import scripts.helpers.tag_manager as tm
     name = "Undefined"
-    display_method: DisplayMethod = 0
+    display_mode: DisplayMode = 0
     sort_methods: list[str] = []
 
     def read_all_tags(self) -> list[list[str]]:
@@ -35,7 +35,7 @@ class TagManagerAPI():
 
 
     def get_col_count(self) -> tuple[int, str]:
-        if self.display_method == 0:
+        if self.display_mode == 0:
             return (3, 'fixed')
         else:
             return (2, 'fixed')
@@ -49,8 +49,8 @@ class TagManagerAPI():
         self.tm.load_tags()
 
 
-    def set_display_method(self, display_method: DisplayMethod):
-        self.display_method = display_method
+    def set_display_mode(self, display_mode: DisplayMode):
+        self.display_mode = display_mode
 
 
     def get_sort_methods(self) -> list[str]:

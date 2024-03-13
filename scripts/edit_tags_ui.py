@@ -137,13 +137,13 @@ def on_ui_tabs():
 
 
 def create_display_mode_component(value, label, elem_id):
-    return gr.Dropdown(["0", "1"], value=value, label=label, elem_id=elem_id)
+    return gr.Dropdown(["By Tag", "By Model"], value=value, label=label, elem_id=elem_id)
 
 def on_ui_settings():
     section = ("sd_lora_tagger", "SD Lora Tagger")
     shared.opts.add_option(hide_nsfw_networks_key,
                            shared.OptionInfo(False, "Hide NSFW-tagged extra networks", section=section))
     shared.opts.add_option(display_mode_key,
-                              shared.OptionInfo("0", "Table display method (0 = by tag, 1 = by model) (requires reload)", component=create_display_mode_component, section=section))
+                              shared.OptionInfo("0", "Table display method (requires reload)", component=create_display_mode_component, section=section))
     update_hide_nsfw()
 
