@@ -40,11 +40,11 @@ def get_display_mode_option():
         opt = shared.opts.data[display_mode_key]
     except KeyError:
         opt = "By Tag"
-        
-    if opt == "By Model":
-        return DisplayMode.MODEL
+
     if opt == "By Tag":
-        return DisplayMode.TAG
+        return 0
+    if opt == "By Model":
+        return 1
 
 update_hide_nsfw()
 
