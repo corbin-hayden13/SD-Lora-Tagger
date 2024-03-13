@@ -69,7 +69,7 @@ class TagEditorUI():
                     headers=self.tag_api.get_headers(),
                     datatype=['str', 'str', 'str'],
                     row_count=(len(data), 'dynamic'),
-                    col_count=(3, 'fixed'),
+                    col_count=self.tag_api.get_col_count(),
                     height=522, # fit perfectly on my screen, might be worth introducing an option for this?
                     interactive=True
                 )

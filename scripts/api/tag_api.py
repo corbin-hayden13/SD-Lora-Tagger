@@ -34,6 +34,13 @@ class TagManagerAPI():
         pass
 
 
+    def get_col_count(self) -> tuple[int, str]:
+        if self.display_method == 0:
+            return (3, 'fixed')
+        else:
+            return (2, 'fixed')
+
+
     def sort(self, sort_method: str) -> list[list[str]]:
         pass
 

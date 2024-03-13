@@ -71,7 +71,7 @@ class TagManagerAPIv1(TagManagerAPI):
         if self.display_method == 0:
             return ['Tag', 'Description', 'Models']
         if self.display_method== 1:
-            return ['Model', ' ', 'Tags']
+            return ['Model', 'Tags']
 
 
     def __read_to_model_display(self, data: list[list[str]]):
@@ -81,7 +81,7 @@ class TagManagerAPIv1(TagManagerAPI):
         result = []
         models = self.tm.get_tagged_models(data)
         for model in models:
-            result.append([model, '', list_to_csv(self.tm.get_tags_by_model(model))])
+            result.append([model, list_to_csv(self.tm.get_tags_by_model(model))])
         return result
     
 
@@ -93,7 +93,7 @@ class TagManagerAPIv1(TagManagerAPI):
         for row in data:
             if row[0] == '' or row[0] is None:
                 continue
-            tags = csv_to_list(row[2])
+            tags = csv_to_list(row[1])
             for tag in tags:
                 obj = self.tm.get_tag_by_name(tag)
                 if obj is None:
@@ -120,4 +120,4 @@ class TagManagerAPIv1(TagManagerAPI):
     
 
     def __sort_by_count(self, data: list[list[str]]) -> list[list[str]]:
-        return sorted(data, key=lambda x: len(csv_to_list(x[2])), reverse=True)
+        return sorted(data, key=lambda x: len(csv_to_list(x[1])), reverse=True)
