@@ -18,7 +18,6 @@ class TagEditorUI():
 
     def save(self, *args):
         if args[0]:
-            self.tag_api.save(args[1])
             return self.toggle_component(False)
         return self.toggle_component(True)
     
@@ -54,7 +53,7 @@ class TagEditorUI():
                     with gr.Row():
                         sort_dropdown = gr.Dropdown(self.tag_api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
                         save_btn = gr.Button(value="Save", scale=3, interactive=False)
-                        save_chk = gr.Checkbox(label="Auto Save", scale=2)
+                        #save_chk = gr.Checkbox(label="Auto Save", scale=2)
                         gr.Column(scale=16)
                         save_btn.update(interactive=False)
 
@@ -79,11 +78,11 @@ class TagEditorUI():
                 add_btn.click(fn=self.add_row, inputs=[table], outputs=[table, rem_btn])
                 rem_btn.click(fn=self.remove_row, inputs=[table, index_num], outputs=[table, rem_btn])
                 save_btn.click(fn=self.save_manual, inputs=[table], outputs=[save_btn, table])
-                save_chk.change(fn=lambda val: self.toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
+                #save_chk.change(fn=lambda val: self.toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
 
                 # This needs some attention. Currently it will never be completely updated without passing
                 # in the dataframe as an input, which results in not being able to retrieve it's value
-                table.change(fn=self.save, inputs=[save_chk, table], outputs=[save_btn])
+                table.change(fn=lambda _: self.save(False), outputs=[save_btn])
 
                 search_txt.input(fn=self.tag_api.search, inputs=[search_txt], outputs=[table])
                 sort_dropdown.input(fn=self.tag_api.sort, inputs=[sort_dropdown], outputs=[table])
