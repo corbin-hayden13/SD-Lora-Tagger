@@ -22,7 +22,7 @@ class TagManagerAPI():
         pass
 
 
-    def del_row(self, index: int = -1) -> list[list[str]]:
+    def del_row(self, data, index: int = -1) -> list[list[str]]:
         pass
 
 

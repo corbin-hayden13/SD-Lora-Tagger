@@ -177,11 +177,13 @@ def update_tag(tag_name: str, description: str = None, models: list[str] = None,
     
     return tag
 
-def remove_tag(index = -1):
+def remove_tag(tag_name):
     """
     Removes a tag from the provided index. Removes the last item by default
     """
-    tags.pop(index)
+    tag = get_tag_by_name(tag_name)
+    if tag is not None:
+        tags.remove(tag)
     return to_dataframe()
 
 

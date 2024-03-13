@@ -33,7 +33,7 @@ class TagManagerAPIv1(TagManagerAPI):
         return self.format_tag_data('read', self.tm.add(tag, index, method=method))
     
 
-    def del_row(self, index: int = -1) -> list[list[str]]:
+    def del_row(self, data, index: int = -1) -> list[list[str]]:
         if self.display_mode == 1:
             table = self.read_all_tags()
             if index > len(table):
@@ -47,7 +47,7 @@ class TagManagerAPIv1(TagManagerAPI):
                     self.tm.remove_model_from_tag(row[0], tag)
             
             return self.read_all_tags()
-        return self.format_tag_data('read', self.tm.remove_tag(index))
+        return self.format_tag_data('read', self.tm.remove_tag(data[index][0]))
     
 
     def save(self, data: list[list[str]]) -> list[list[str]]:
@@ -68,16 +68,11 @@ class TagManagerAPIv1(TagManagerAPI):
         base_data = data if not data is None else self.tm.to_dataframe()
         if operation == 'read':
             if self.display_mode == 0:
-                i = 0
-                if len(base_data) > 0 and '' in base_data[0]:
-                    # Remove placeholder tag
-                    for row in base_data:
-                        if row[0] != '' and row[0] != None:
-                            i += 1
-                            continue
-                        break
-                    print(i)
-                    base_data.pop(i)
+                tags = []
+                for row in base_data:
+                    tags.append(row[0])
+                if '' in tags:
+                    base_data.pop(tags.index(''))
 
                 return base_data
             if self.display_mode == 1:

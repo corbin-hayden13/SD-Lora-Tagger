@@ -26,9 +26,9 @@ class TagEditorUI():
         return self.toggle_component(False), self.tag_api.save(args[0])
     
 
-    def remove_row(self, index):
+    def remove_row(self, data, index):
         update = self.toggle_component(True)
-        data = self.tag_api.del_row(int(index))
+        data = self.tag_api.del_row(data, int(index))
         if len(data) == 0:
             update = self.toggle_component(False)
             
@@ -77,7 +77,7 @@ class TagEditorUI():
                 )
                 print(f'DATAFRAME ROWS: {table.row_count[0]}')
                 add_btn.click(fn=self.add_row, inputs=[table], outputs=[table, rem_btn])
-                rem_btn.click(fn=self.remove_row, inputs=[index_num], outputs=[table, rem_btn])
+                rem_btn.click(fn=self.remove_row, inputs=[table, index_num], outputs=[table, rem_btn])
                 save_btn.click(fn=self.save_manual, inputs=[table], outputs=[save_btn, table])
                 save_chk.change(fn=lambda val: self.toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
 
