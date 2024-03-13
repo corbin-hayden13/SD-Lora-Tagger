@@ -13,6 +13,7 @@ class ExtrasAPI():
         bind_table() - Binds the table to be dynamically resized
     """
     
+    table = None
     min_max_height = (470, 522)
     __open__ = False
     __js_container__: gr.TextArea = None
@@ -35,6 +36,7 @@ class ExtrasAPI():
     
     def bind_table(self, table: gr.Matrix):
         self.__js_container__.change(self.__update_state_internal, inputs=self.__js_container__, outputs=table)
+        self.table = table
     
     def __update_state_internal(self, state):
         self.__open__ = bool(int(state)) # Convert string to bool (ex. "0" -> False)
