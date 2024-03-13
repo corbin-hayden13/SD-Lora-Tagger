@@ -59,4 +59,5 @@ def update():
     for network in networks_to_update:
         update_network(network)
     print("SD Lora Tagger: Tags updated successfully!")
-    tm.save_tags_debug()
+    # tm.save_tags_debug()
+    tm.save_tags()
