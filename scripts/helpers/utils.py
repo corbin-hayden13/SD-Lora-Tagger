@@ -71,6 +71,8 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
 
         for file in files:
             if not os.path.exists(os.path.join(descriptions_path, f"{network}/{file}.txt")):
+                if not os.path.exists(descriptions_path):
+                    os.mkdir(descriptions_path)
                 if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
                     os.mkdir(os.path.join(descriptions_path, f"{network}/"))
 

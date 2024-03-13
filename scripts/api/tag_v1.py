@@ -69,13 +69,15 @@ class TagManagerAPIv1(TagManagerAPI):
         if operation == 'read':
             if self.display_mode == 0:
                 i = 0
-                # Remove placeholder tag
-                for row in base_data:
-                    if row[0] != '':
-                        i += 1
-                        continue
-                    break
-                base_data.pop(i)
+                if len(base_data) > 0 and '' in base_data[0]:
+                    # Remove placeholder tag
+                    for row in base_data:
+                        if row[0] != '' and row[0] != None:
+                            i += 1
+                            continue
+                        break
+                    print(i)
+                    base_data.pop(i)
 
                 return base_data
             if self.display_mode == 1:
