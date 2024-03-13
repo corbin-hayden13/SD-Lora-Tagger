@@ -17,7 +17,7 @@ class ExtrasAPI():
     __open__ = False
     __js_container__: gr.TextArea = None
 
-    def create(self) -> gr.Accordion:
+    def create(self, label='Extras') -> gr.Accordion:
         """
         When overriding, use `super().create()` in inheritors to properly implement accordion update logic.
 
@@ -29,7 +29,7 @@ class ExtrasAPI():
         return extras
         ```
         """
-        with gr.Accordion("Extras", open=False, elem_id="sd_lora_tagger_extras") as accordion:
+        with gr.Accordion(label, open=False, elem_id="sd_lora_tagger_extras") as accordion:
             self.__js_container__ = gr.TextArea(elem_id="sd_lora_tagger_container", visible=False)
         return accordion
     
