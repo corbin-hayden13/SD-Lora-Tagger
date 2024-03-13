@@ -18,7 +18,7 @@ class TagManagerAPI():
         pass
 
 
-    def add_row(self, index: int = -1) -> list[list[str]]:
+    def add_row(self, data, index: int = -1) -> list[list[str]]:
         pass
 
 

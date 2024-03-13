@@ -26,17 +26,17 @@ class TagEditorUI():
         return self.toggle_component(False), self.tag_api.save(args[0])
     
 
-    def remove_row(self):
+    def remove_row(self, index):
         update = self.toggle_component(True)
-        data = self.tag_api.del_row()
+        data = self.tag_api.del_row(int(index))
         if len(data) == 0:
             update = self.toggle_component(False)
             
         return (data, update)
     
 
-    def add_row(self):
-        return self.tag_api.add_row(), self.toggle_component(True)
+    def add_row(self, data):
+        return self.tag_api.add_row(data), self.toggle_component(True)
 
 
     def on_ui_tabs(self):
@@ -66,7 +66,7 @@ class TagEditorUI():
                             
             with gr.Row():
                 data = self.tag_api.read_all_tags()
-                frame = gr.Matrix(
+                table = gr.Matrix(
                     data,
                     headers=self.tag_api.get_headers(),
                     datatype=['str', 'str', 'str'],
@@ -75,19 +75,19 @@ class TagEditorUI():
                     height=522, # fit perfectly on my screen, might be worth introducing an option for this?
                     interactive=True
                 )
-                print(f'DATAFRAME ROWS: {frame.row_count[0]}')
-                add_btn.click(fn=self.add_row, outputs=[frame, rem_btn])
-                rem_btn.click(fn=lambda _: self.remove_row(), outputs=[frame, rem_btn])
-                save_btn.click(fn=self.save_manual, inputs=[frame], outputs=[save_btn, frame])
+                print(f'DATAFRAME ROWS: {table.row_count[0]}')
+                add_btn.click(fn=self.add_row, inputs=[table], outputs=[table, rem_btn])
+                rem_btn.click(fn=self.remove_row, inputs=[index_num], outputs=[table, rem_btn])
+                save_btn.click(fn=self.save_manual, inputs=[table], outputs=[save_btn, table])
                 save_chk.change(fn=lambda val: self.toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
 
                 # This needs some attention. Currently it will never be completely updated without passing
                 # in the dataframe as an input, which results in not being able to retrieve it's value
-                frame.change(fn=self.save, inputs=[save_chk, frame], outputs=[save_btn])
+                table.change(fn=self.save, inputs=[save_chk, table], outputs=[save_btn])
 
-                search_txt.input(fn=self.tag_api.search, inputs=[search_txt], outputs=[frame])
-                sort_dropdown.input(fn=self.tag_api.sort, inputs=[sort_dropdown], outputs=[frame])
+                search_txt.input(fn=self.tag_api.search, inputs=[search_txt], outputs=[table])
+                sort_dropdown.input(fn=self.tag_api.sort, inputs=[sort_dropdown], outputs=[table])
                 if self.extras_api is not None:
-                    self.extras_api.bind_table(frame)
+                    self.extras_api.bind_table(table)
            
         return [(sd_lora_tagger, "Tag Editor", "sd_lora_tagger")]

@@ -4,7 +4,6 @@ import os
 import modules.scripts as scripts
 import modules.shared as shared
 from modules.cmd_args import parser
-from scripts.api.tag_api import DisplayMode
 
 
 global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path

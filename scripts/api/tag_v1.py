@@ -6,8 +6,7 @@ class TagManagerAPIv1(TagManagerAPI):
     from typing import Literal
 
     name = "TagManagerAPI v1"
-    first_call = True       
-    
+    first_call = True
 
     def set_display_mode(self, display_mode: DisplayMode):
         super().set_display_mode(display_mode)
@@ -25,14 +24,29 @@ class TagManagerAPIv1(TagManagerAPI):
         return self.format_tag_data('read', self.tm.search(search_term))
     
 
-    def add_row(self, index: int = -1) -> list[list[str]]:
-        tag: self.tm.Tag = None
+    def add_row(self, data, index: int = 0) -> list[list[str]]:
+        tag: self.tm.Tag = self.tm.Tag(name='placeholder', description='', models=[])
+        method = 'tag'
         if self.display_mode == 1:
-            tag = self.tm.Tag(name='placeholder', description='', models=['my_model'])
-        return self.format_tag_data('read', self.tm.add_tag(tag))
+            method = 'model'
+            tag = self.tm.Tag(name='placeholder', description='', models=[self.tm.avoid_duplicate('my_model', method=method, data=self.format_tag_data('write', data))])
+        return self.format_tag_data('read', self.tm.add(tag, index, method=method))
     
 
     def del_row(self, index: int = -1) -> list[list[str]]:
+        if self.display_mode == 1:
+            table = self.read_all_tags()
+            if index > len(table):
+                index = -1
+            row = table[index]
+            tags = csv_to_list(row[1])
+            if len(tags) == 0:
+                self.tm.remove_model_from_tag(row[0], None)
+            else:
+                for tag in tags:
+                    self.tm.remove_model_from_tag(row[0], tag)
+            
+            return self.read_all_tags()
         return self.format_tag_data('read', self.tm.remove_tag(index))
     
 
@@ -54,6 +68,15 @@ class TagManagerAPIv1(TagManagerAPI):
         base_data = data if not data is None else self.tm.to_dataframe()
         if operation == 'read':
             if self.display_mode == 0:
+                i = 0
+                # Remove placeholder tag
+                for row in base_data:
+                    if row[0] != '':
+                        i += 1
+                        continue
+                    break
+                base_data.pop(i)
+
                 return base_data
             if self.display_mode == 1:
                 return self.__read_to_model_display(base_data)
@@ -98,7 +121,7 @@ class TagManagerAPIv1(TagManagerAPI):
                 obj = self.tm.get_tag_by_name(tag)
                 if obj is None:
                     obj = self.tm.Tag(name=tag, models=[row[0]])
-                    self.tm.add_tag(new_tag=obj)
+                    self.tm.add(new_tag=obj)
 
                 try:
                     buffer[obj].append(row[0])

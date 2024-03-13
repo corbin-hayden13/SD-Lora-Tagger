@@ -144,6 +144,6 @@ def on_ui_settings():
     shared.opts.add_option(hide_nsfw_networks_key,
                            shared.OptionInfo(False, "Hide NSFW-tagged extra networks", section=section))
     shared.opts.add_option(display_mode_key,
-                              shared.OptionInfo("0", "Table display method (requires reload)", component=create_display_mode_component, section=section))
+                              shared.OptionInfo("0", "Table display mode (requires reload)", component=create_display_mode_component, section=section))
     update_hide_nsfw()
 

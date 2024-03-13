@@ -119,10 +119,19 @@ def save_tags_debug():
         f.write(js)
 
 
-def add_tag(new_tag: Tag = None, index = 0):
+def add(new_tag: Tag = None, index = 0, method: Literal['tag', 'model'] = 'tag'):
     """
-    Adds a new tag at the given index (default: 0), creates a new tag using default values if 'new_tag' is not provided.
+    Adds a new item at the given index (default: 0), creates a new tag using default values if 'new_tag' is not provided.
     """
+    if method == 'model':
+        t = get_tag_by_name(new_tag.name)
+        if t is None:
+            tags.insert(index, new_tag)
+            return to_dataframe()
+        if new_tag.models[-1] not in t.models:
+            t.models.append(new_tag.models[-1])
+        return to_dataframe()
+        
     if new_tag is not None:
         new_tag.name = avoid_duplicate(new_tag.name)
         tags.insert(index, new_tag)
@@ -173,6 +182,19 @@ def remove_tag(index = -1):
     Removes a tag from the provided index. Removes the last item by default
     """
     tags.pop(index)
+    return to_dataframe()
+
+
+def remove_model_from_tag(model, tag) -> list[list[str]]:
+    if tag is None:
+        tag = ''
+    t = get_tag_by_name(tag)
+    print(f"{tag}: {model}")
+    if t is not None:
+        if model in t.models:
+            print(f"remoivng {model} from {tag}")
+            t.models.remove(model)
+        
     return to_dataframe()
 
 
@@ -272,7 +294,7 @@ def get_search_terms(model_name: str) -> str:
     return list_to_csv(tags)
     
 
-def avoid_duplicate(tag_name: str, exclude_current = False):
+def avoid_duplicate(name: str, exclude_current = False, method: Literal['tag', 'model'] = 'tag', data: list[list[str]] = None):
     """
     Checks tags with the same name exists, and generates a unique suffix if it does.
 
@@ -280,19 +302,28 @@ def avoid_duplicate(tag_name: str, exclude_current = False):
         exclude_current - Whether or not to exclude the current entry from the dupe check (use if calling before the current tag is loaded)
     """
     count = 0
-    for tag in tags:
-        if tag.name == tag_name:
-            count += 1
+    
+    if method == 'tag':
+        for tag in tags:
+            if tag.name == name:
+                count += 1
+    if method == 'model' and name in get_tagged_models(data):
+        count += 1
+
     if count > 1 or (not exclude_current and count > 0):
-        return generate_suffix_recursive(tag_name)
-    return tag_name
+        return generate_suffix_recursive(name, method=method, data=data)
+    return name
 
 
-def generate_suffix_recursive(tag_name: str, i = 0) -> str: 
+def generate_suffix_recursive(tag_name: str, i = 0, method: Literal['tag', 'model'] = 'tag', data = None) -> str: 
     """
     Recursive function to avoid duplicate tag names
     """
-    if get_tag_by_name(f'{tag_name}_{i}') is not None:
-        return generate_suffix_recursive(tag_name, i+1)
+    if method == 'tag':
+        if get_tag_by_name(f'{tag_name}_{i}') is not None:
+            return generate_suffix_recursive(tag_name, i+1, method, data)
+    if method == 'model':
+        if f'{tag_name}_{i}' in get_tagged_models(data):
+            return generate_suffix_recursive(tag_name, i+1, method, data)
     
     return f'{tag_name}_{i}'
