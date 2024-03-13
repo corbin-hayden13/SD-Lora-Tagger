@@ -78,24 +78,6 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                     f.write(file)
 
 
-def get_or_create_tags_file(base_path, filename):
-    path = os.path.join(base_path, f"{os.path.basename(filename).split('.')[0]}.txt")
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            search_terms = f.read()
-
-        return search_terms
-    except FileNotFoundError:
-        if not os.path.isdir(base_path):
-            Path(base_path).mkdir(parents=True)  # All directories might not exist
-
-        with open(path, 'w', encoding='utf-8') as f:
-            search_terms = os.path.basename(filename).split('.')[0]
-            f.write(search_terms)
-
-        return search_terms
-
-
 def clear_js_overrides(directory):
     # https://stackoverflow.com/questions/61821102/how-can-i-delete-files-by-extension-in-subfolders-of-a-folder
     for (dirname, dirs, files) in os.walk(directory):

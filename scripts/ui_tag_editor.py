@@ -42,49 +42,50 @@ class TagEditorUI():
     def on_ui_tabs(self):
         print(f'SD_Lora_Tagger: Loading UI (using {self.tag_api.name})')
         with gr.Blocks() as sd_lora_tagger:
-            with gr.Column():
-                with gr.Row():
-                    with gr.Column():
+            with gr.Row():
+                with gr.Column(scale=6):
+                    with gr.Row():
+                        add_btn = gr.Button(value="Add", variant='primary', scale=3)
+                        rem_btn = gr.Button(value="Remove", variant='primary', scale=3)
+                        search_txt = gr.Textbox(placeholder="Search...", scale=20, show_label=False)
+                        
+        
+                    with gr.Row():
+                        sort_dropdown = gr.Dropdown(self.tag_api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
+                        save_btn = gr.Button(value="Save", scale=3, interactive=False)
+                        save_chk = gr.Checkbox(label="Auto Save", scale=2)
+                        gr.Column(scale=16)
+                        save_btn.update(interactive=False)
+
+                with gr.Column(scale=4):
+                    if self.extras_api is not None:
                         with gr.Row():
-                            add_btn = gr.Button(value="Add", variant='primary', scale=3)
-                            rem_btn = gr.Button(value="Remove", variant='primary', scale=3)
-                            search_txt = gr.Textbox(placeholder="Search...", scale=20, show_label=False)
+                            self.extras_api.create()
                             
-            
-                        with gr.Row():
-                            sort_dropdown = gr.Dropdown(self.tag_api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
-                            save_btn = gr.Button(value="Save", scale=3, interactive=False)
-                            save_chk = gr.Checkbox(label="Auto Save", scale=2)
-                            gr.Column(scale=16)
-                            save_btn.update(interactive=False)
+            with gr.Row():
+                data = self.tag_api.read_all_tags()
+                frame = gr.Matrix(
+                    data,
+                    headers=self.tag_api.get_headers(),
+                    datatype=['str', 'str', 'str'],
+                    row_count=(len(data), 'dynamic'),
+                    col_count=(3, 'fixed'),
+                    height=522, # fit perfectly on my screen, might be worth introducing an option for this?
+                    interactive=True
+                )
+                print(f'DATAFRAME ROWS: {frame.row_count[0]}')
+                add_btn.click(fn=self.add_row, outputs=[frame, rem_btn])
+                rem_btn.click(fn=lambda _: self.remove_row(), outputs=[frame, rem_btn])
+                save_btn.click(fn=self.save_manual, inputs=[frame], outputs=[save_btn, frame])
+                save_chk.change(fn=lambda val: self.toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
 
-                        if self.extras_api is not None:
-                            with gr.Row():
-                                self.extras_api.create()
-                            
-                        with gr.Row():
-                            data = self.tag_api.read_all_tags()
-                            frame = gr.Matrix(
-                                data,
-                                headers=self.tag_api.get_headers(),
-                                datatype=['str', 'str', 'str'],
-                                row_count=(len(data), 'dynamic'),
-                                col_count=(3, 'fixed'),
-                                height=522, # fit perfectly on my screen, might be worth introducing an option for this?
-                                interactive=True
-                            )
-                            print(f'DATAFRAME ROWS: {frame.row_count[0]}')
-                            add_btn.click(fn=self.add_row, outputs=[frame, rem_btn])
-                            rem_btn.click(fn=lambda _: self.remove_row(), outputs=[frame, rem_btn])
-                            save_btn.click(fn=self.save_manual, inputs=[frame], outputs=[save_btn, frame])
-                            save_chk.change(fn=lambda val: self.toggle_component(not val), inputs=[save_chk], outputs=[save_btn])
+                # This needs some attention. Currently it will never be completely updated without passing
+                # in the dataframe as an input, which results in not being able to retrieve it's value
+                frame.change(fn=self.save, inputs=[save_chk, frame], outputs=[save_btn])
 
-                            # This needs some attention. Currently it will never be completely updated without passing
-                            # in the dataframe as an input, which results in not being able to retrieve it's value
-                            frame.change(fn=self.save, inputs=[save_chk, frame], outputs=[save_btn])
-
-                            search_txt.input(fn=self.tag_api.search, inputs=[search_txt], outputs=[frame])
-                            sort_dropdown.input(fn=self.tag_api.sort, inputs=[sort_dropdown], outputs=[frame])
-                            if self.extras_api is not None:
-                                self.extras_api.bind_table(frame)
+                search_txt.input(fn=self.tag_api.search, inputs=[search_txt], outputs=[frame])
+                sort_dropdown.input(fn=self.tag_api.sort, inputs=[sort_dropdown], outputs=[frame])
+                if self.extras_api is not None:
+                    self.extras_api.bind_table(frame)
+           
         return [(sd_lora_tagger, "Tag Editor", "sd_lora_tagger")]
