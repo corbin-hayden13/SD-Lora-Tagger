@@ -45,9 +45,10 @@ class TagEditorUI():
             with gr.Row():
                 with gr.Column(scale=6):
                     with gr.Row():
-                        add_btn = gr.Button(value="Add", variant='primary', scale=3)
-                        rem_btn = gr.Button(value="Remove", variant='primary', scale=3)
-                        search_txt = gr.Textbox(placeholder="Search...", scale=20, show_label=False)
+                        add_btn = gr.Button(value="Add", variant='primary', scale=4)
+                        rem_btn = gr.Button(value="Remove", variant='primary', scale=4)
+                        index_num = gr.Number(value=-1, label="Row Index", scale=1, min_width=100)
+                        search_txt = gr.Textbox(placeholder="Search...", label="Search", scale=25)
                         
         
                     with gr.Row():
@@ -59,6 +60,7 @@ class TagEditorUI():
 
                 with gr.Column(scale=4):
                     if self.extras_api is not None:
+                        gr.Row() # this, for some miraculous reason, aligns the content almost perfectly
                         with gr.Row():
                             self.extras_api.create()
                             
