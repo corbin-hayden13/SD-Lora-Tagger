@@ -110,8 +110,8 @@ def csv_to_list(data) -> list:
     Converts comma seperated values to a python list
     """
     ls = []
-    for item in data.replace(' ', '').split(','): # remove whitespaces and seperate by comma
-        ls.append(item)
+    for item in data.split(','): # remove whitespaces and seperate by comma
+        ls.append(item.strip())
     return ls
 
 
