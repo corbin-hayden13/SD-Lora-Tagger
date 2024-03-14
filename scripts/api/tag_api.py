@@ -36,9 +36,9 @@ class TagManagerAPI():
 
     def get_col_count(self) -> tuple[int, str]:
         if self.display_mode is DisplayMode.TAG:
-            return (3, 'fixed')
+            return (4, 'fixed')
         else:
-            return (2, 'fixed')
+            return (3, 'fixed')
 
 
     def sort(self, sort_method: str) -> list[list[str]]:

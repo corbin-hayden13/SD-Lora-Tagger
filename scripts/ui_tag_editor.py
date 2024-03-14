@@ -46,7 +46,7 @@ class TagEditorUI():
                     with gr.Row():
                         add_btn = gr.Button(value="Add", variant='primary', scale=4)
                         rem_btn = gr.Button(value="Remove", variant='primary', scale=4)
-                        index_num = gr.Number(value=-1, label="Row Index", scale=1, min_width=100)
+                        index_num = gr.Number(value=0, label="Row Index", scale=1, min_width=100)
                         search_txt = gr.Textbox(placeholder="Search...", label="Search", scale=25)
                         
         
