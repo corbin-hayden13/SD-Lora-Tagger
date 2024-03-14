@@ -47,15 +47,14 @@ class TagEditorUI():
                         add_btn = gr.Button(value="Add", variant='primary', scale=4)
                         rem_btn = gr.Button(value="Remove", variant='primary', scale=4)
                         index_num = gr.Number(value=0, label="Row Index", scale=1, min_width=100)
-                        search_txt = gr.Textbox(placeholder="Search...", label="Search", scale=25)
-                        
         
                     with gr.Row():
-                        sort_dropdown = gr.Dropdown(self.tag_api.get_sort_methods(), value='Alphabetically', label="Sort", scale=3)
-                        save_btn = gr.Button(value="Save", scale=3, interactive=False)
+                        save_btn = gr.Button(value="Save", scale=23, interactive=False)
+                        sort_dropdown = gr.Dropdown(self.tag_api.get_sort_methods(), value='Alphabetically', label="Sort", scale=50)
                         #save_chk = gr.Checkbox(label="Auto Save", scale=2)
-                        gr.Column(scale=16)
-                        save_btn.update(interactive=False)
+
+                with gr.Column(scale=13):
+                    search_txt = gr.Textbox(placeholder="Search...", label="Search")
 
                 with gr.Column(scale=4):
                     if self.extras_api is not None:
