@@ -164,7 +164,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
             path, _ext = splitext(lora_on_disk.filename)
             alias = lora_on_disk.get_alias()
             prompt = (json.dumps(f"<lora:{alias}") + " + " + json.dumps(f':{shared.opts.extra_networks_default_multiplier}') + " + " + json.dumps(">"))
-            metadata =  json.dumps(lora_on_disk.metadata, indent=4) if lora_on_disk.metadata else None
+            metadata = json.dumps(lora_on_disk.metadata, indent=4) if lora_on_disk.metadata else None
             possible_tags = lora_on_disk.metadata.get('ss_tag_frequency', {}) if lora_on_disk.metadata is not None else {}
             if isinstance(possible_tags, str):
                 possible_tags = {}
@@ -186,6 +186,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 "hash": lora_on_disk.shorthash,
                 "preview": self.find_preview(path),
                 "description": self.find_description(path),
+                "extras": self.extras,
                 "search_term": f"{os.path.basename(lora_on_disk.filename)} {search_terms}|||{self.extras}",
                 # self.search_terms_from_path(lora_on_disk.filename),
                 "prompt": prompt,

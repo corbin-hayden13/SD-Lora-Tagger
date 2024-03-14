@@ -108,7 +108,7 @@ def on_ui_tabs():
 
                 set_visible = not ("nsfw" in file_data.lower().split(",") and hide_nsfw)
 
-                with gr.Row(elem_id=f"{file_name}_row_container", equal_height=True) as new_file_row:
+                with gr.Row(elem_id=f"{file_name}_row_container", equal_height=True):
                     with gr.Column(elem_id=f"{file_name}_textbox_col", scale=7):
                         # Adds file path to info for later reference when saving
                         textbox = gr.Textbox(label=file_name, value=file_data, elem_id=f"{file_name}_textbox",

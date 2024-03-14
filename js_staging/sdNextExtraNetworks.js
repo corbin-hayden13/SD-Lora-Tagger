@@ -14,7 +14,7 @@ if (typeof getENActiveTab === "undefined") {
 
 var uniqueDelimiter = "|||";
 
-function requestGet(url, data, handler, errorHandler) {
+/*function requestGet(url, data, handler, errorHandler) {
   const xhr = new XMLHttpRequest();
   const args = Object.keys(data).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}`).join('&');
   xhr.open('GET', `${url}?${args}`, true);
@@ -35,7 +35,7 @@ function requestGet(url, data, handler, errorHandler) {
   };
   const js = JSON.stringify(data);
   xhr.send(js);
-}
+}*/
 
 function setupExtraNetworksForTab(tabname) {
   console.log("SD Lora Tagger -> SD.Next: Hello!")
@@ -58,11 +58,15 @@ function setupExtraNetworksForTab(tabname) {
   // Hide div cards if hide_nsfw=true
   gradioApp().querySelectorAll(`#${tabname}_extra_tabs div.card`).forEach((elem) => {
     let overrides = `${elem.querySelector('.search_term').textContent.toLowerCase()}`.split(uniqueDelimiter)[1];
-        let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
-        let text = `${elem.querySelector('.name').textContent.toLowerCase()} ${elem.querySelector('.search_term').textContent.toLowerCase()}`;
-        if (text.split(uniqueDelimiter)[0].indexOf("nsfw") > -1 && nsfw_override) {
-            elem.style.display = "none";
-        }
+    let testExtras = `${elem.querySelector('.extras').textContent.toLowerCase()}`;
+
+    console.log(`SD Lora Tagger -> SD.Next: Extras=${testExtras}`)
+
+    let nsfw_override = JSON.parse(overrides)["hide_nsfw"] === "true";
+    let text = `${elem.querySelector('.name').textContent.toLowerCase()} ${elem.querySelector('.search_term').textContent.toLowerCase()}`;
+    if (text.split(uniqueDelimiter)[0].indexOf("nsfw") > -1 && nsfw_override) {
+      elem.style.display = "none";
+    }
   });
   search.addEventListener('input', (evt) => {
     const searchTerm = search.value.toLowerCase();
