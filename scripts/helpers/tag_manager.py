@@ -5,7 +5,7 @@ from typing import Literal
 
 from scripts.helpers.paths import tags_path, tags_path_d, ui_config_path, ui_config_debug
 from scripts.helpers.utils import csv_to_list, list_to_csv
-from scripts.globals import network_descriptions_path
+import scripts.globals as gl
 
 class Tag(object):
     name: str
@@ -55,8 +55,8 @@ def update_cache():
 
 
 def get_or_create_tags_file() -> str:
-    if not os.path.isdir(network_descriptions_path):
-        os.mkdir(network_descriptions_path)
+    if not os.path.isdir(gl.network_descriptions_path):
+        os.mkdir(gl.network_descriptions_path)
     if not os.path.exists(tags_path):
         print('SD-Lora-Tagger: Tags file did not exist, creating one...')
         with open(tags_path, 'w', encoding='utf-8') as f:

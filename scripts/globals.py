@@ -4,6 +4,7 @@ import os
 import modules.scripts as scripts
 import modules.shared as shared
 from modules.cmd_args import parser
+from scripts.api.tag_api import DisplayMode
 
 
 global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
@@ -38,12 +39,12 @@ def get_display_mode_option():
     try:
         opt = shared.opts.data[display_mode_key]
     except KeyError:
-        opt = "By Tag"
+        return DisplayMode.TAG
 
     if opt == "By Tag":
-        return 0
+        return DisplayMode.TAG
     if opt == "By Model":
-        return 1
+        return DisplayMode.MODEL
 
 update_hide_nsfw()
 

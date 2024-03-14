@@ -27,14 +27,14 @@ class TagManagerAPIv1(TagManagerAPI):
     def add_row(self, data, index: int = 0) -> list[list[str]]:
         tag: self.tm.Tag = self.tm.Tag(name='placeholder', description='', models=[])
         method = 'tag'
-        if self.display_mode == 1:
+        if self.display_mode is DisplayMode.MODEL:
             method = 'model'
             tag = self.tm.Tag(name='placeholder', description='', models=[self.tm.avoid_duplicate('my_model', method=method, data=self.format_tag_data('write', data))])
         return self.format_tag_data('read', self.tm.add(tag, index, method=method))
     
 
     def del_row(self, data, index: int = -1) -> list[list[str]]:
-        if self.display_mode == 1:
+        if self.display_mode is DisplayMode.MODEL:
             table = self.read_all_tags()
             if index > len(table):
                 index = -1
@@ -67,7 +67,7 @@ class TagManagerAPIv1(TagManagerAPI):
     def format_tag_data(self, operation: Literal['read', 'write'], data: list[list[str]] = None) -> list[list[str]]:
         base_data = data if not data is None else self.tm.to_dataframe()
         if operation == 'read':
-            if self.display_mode == 0:
+            if self.display_mode is DisplayMode.TAG:
                 tags = []
                 for row in base_data:
                     tags.append(row[0])
@@ -75,22 +75,22 @@ class TagManagerAPIv1(TagManagerAPI):
                     base_data.pop(tags.index(''))
 
                 return base_data
-            if self.display_mode == 1:
+            if self.display_mode is DisplayMode.MODEL:
                 return self.__read_to_model_display(base_data)
             
         if operation == 'write':
-            if self.display_mode == 0:
+            if self.display_mode is DisplayMode.TAG:
                 return base_data
-            if self.display_mode == 1:
+            if self.display_mode is DisplayMode.MODEL:
                 return self.__write_from_model_display(base_data)
         
         raise NotImplementedError()
 
 
     def get_headers(self) -> list[str]:
-        if self.display_mode == 0:
+        if self.display_mode is DisplayMode.TAG:
             return ['Tag', 'Description', 'Models']
-        if self.display_mode== 1:
+        if self.display_mode is DisplayMode.MODEL:
             return ['Model', 'Tags']
 
 

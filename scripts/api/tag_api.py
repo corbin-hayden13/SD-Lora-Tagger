@@ -7,7 +7,7 @@ class DisplayMode(Enum):
 class TagManagerAPI():
     import scripts.helpers.tag_manager as tm
     name = "Undefined"
-    display_mode: DisplayMode = 0
+    display_mode: DisplayMode = DisplayMode.TAG
     sort_methods: list[str] = []
 
     def read_all_tags(self) -> list[list[str]]:
@@ -35,7 +35,7 @@ class TagManagerAPI():
 
 
     def get_col_count(self) -> tuple[int, str]:
-        if self.display_mode == 0:
+        if self.display_mode is DisplayMode.TAG:
             return (3, 'fixed')
         else:
             return (2, 'fixed')

@@ -14,7 +14,7 @@ class ExtrasAPI():
     """
     
     table = None
-    min_max_height = (470, 522)
+    min_max_height = (522, 522) # Change if the extras tab extends beyond other UI
     __open__ = False
     __js_container__: gr.TextArea = None
 
