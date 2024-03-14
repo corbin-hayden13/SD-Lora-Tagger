@@ -45,6 +45,8 @@ def get_display_mode_option():
         return DisplayMode.TAG
     if opt == "By Model":
         return DisplayMode.MODEL
+    
+    return DisplayMode.TAG
 
 update_hide_nsfw()
 
