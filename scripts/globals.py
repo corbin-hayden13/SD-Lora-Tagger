@@ -4,12 +4,13 @@ import os
 import modules.scripts as scripts
 import modules.shared as shared
 from modules.cmd_args import parser
+from scripts.api.tag_api import DisplayMode
 
 
 global hide_nsfw_networks_key, hide_nsfw, network_descriptions_path
 
-
 hide_nsfw_networks_key = "sd_lora_tagger_hide_nsfw_extra_networks"
+display_mode_key = "sd_lora_tagger_display_mode"
 network_descriptions_path = os.path.join(scripts.basedir(), "network_descriptions")
 
 using_sd_next = parser.description is not None and parser.description == "SD.Next"
@@ -33,6 +34,19 @@ def update_hide_nsfw(extras=None):
 
     else: return extras
 
+
+def get_display_mode_option():
+    try:
+        opt = shared.opts.data[display_mode_key]
+    except KeyError:
+        return DisplayMode.TAG
+
+    if opt == "By Tag":
+        return DisplayMode.TAG
+    if opt == "By Model":
+        return DisplayMode.MODEL
+    
+    return DisplayMode.TAG
 
 update_hide_nsfw()
 

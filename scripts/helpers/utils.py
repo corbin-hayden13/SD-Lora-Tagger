@@ -2,8 +2,8 @@ import os
 from glob import glob
 import sys
 from importlib import import_module
+from scripts.helpers.paths import extension_paths
 from pathlib import Path
-from modules import paths_internal
 
 
 def import_lora_lycoris():
@@ -11,10 +11,7 @@ def import_lora_lycoris():
     extra_networks_lora = None
     lycoris = None
 
-    # Paths used from modules/paths_internal.py
-    non_std_module_paths = [f'{os.path.join(paths_internal.extensions_builtin_dir, "Lora")}',
-                            f'{os.path.join(paths_internal.extensions_builtin_dir, "a1111-sd-webui-lycoris")}'] # Not included in A1111
-    for module_path in non_std_module_paths:
+    for module_path in extension_paths:
         if module_path not in sys.path:
             sys.path.append(module_path)
 
@@ -59,6 +56,8 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
                 networks[key] = included_networks[key]
 
     for network in networks:
+        if os.path.exists(os.path.join(descriptions_path, f"{network}_OLD/")):
+            continue
         # Necessary to find embeddings for AUTOMATIC1111/stable-diffusion-webui
         if network == "embeddings" and not os.path.exists(os.path.join(models_path, f"{network}/")):
             path = "./embeddings"
@@ -72,29 +71,13 @@ def init_extra_network_tags(models_path, descriptions_path, included_networks=No
 
         for file in files:
             if not os.path.exists(os.path.join(descriptions_path, f"{network}/{file}.txt")):
+                if not os.path.exists(descriptions_path):
+                    os.mkdir(descriptions_path)
                 if not os.path.exists(os.path.join(descriptions_path, f"{network}/")):
                     os.mkdir(os.path.join(descriptions_path, f"{network}/"))
 
-                with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w") as f:
+                with open(os.path.join(descriptions_path, f"{network}/{file}.txt"), "w", encoding='utf8') as f:
                     f.write(file)
-
-
-def get_or_create_tags_file(base_path, filename):
-    path = os.path.join(base_path, f"{os.path.basename(filename).split('.')[0]}.txt")
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            search_terms = f.read()
-
-        return search_terms
-    except FileNotFoundError:
-        if not os.path.isdir(base_path):
-            Path(base_path).mkdir(parents=True)  # All directories might not exist
-
-        with open(path, 'w', encoding='utf-8') as f:
-            search_terms = os.path.basename(filename).split('.')[0]
-            f.write(search_terms)
-
-        return search_terms
 
 
 def clear_js_overrides(directory):
@@ -111,13 +94,31 @@ def load_tags(descriptions_path):
     all_tags = {}
 
     for file in files:
-        with open(file) as f:
+        with open(file, encoding='utf-8') as f:
+            file_name = os.path.basename(file).split(".")[0]
             tags = f.read().split(",")
 
             for tag in tags:
                 try:
-                    all_tags[tag].append(file)
+                    all_tags[tag].append(file.replace(f'{file_name}, ', ''))
                 except KeyError:
-                    all_tags[tag] = [file]
+                    all_tags[tag] = [file.replace(f'{file_name}, ', '')]
 
     return all_tags
+
+
+def csv_to_list(data) -> list:
+    """
+    Converts comma seperated values to a python list
+    """
+    ls = []
+    for item in data.split(','): # remove whitespaces and seperate by comma
+        ls.append(item.strip())
+    return ls
+
+
+def list_to_csv(data: list):
+    """
+    Converts a list to a string of comma seperated values
+    """
+    return ', '.join(data)

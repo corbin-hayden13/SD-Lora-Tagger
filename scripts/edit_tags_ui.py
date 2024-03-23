@@ -4,8 +4,9 @@ import gradio as gr
 
 import modules.shared as shared
 
-from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path
+from scripts.globals import update_hide_nsfw, hide_nsfw, network_descriptions_path, hide_nsfw_networks_key, display_mode_key
 
+from scripts.helpers.paths import base_dir
 
 global all_tags, all_txt_files
 
@@ -13,7 +14,7 @@ global all_tags, all_txt_files
 def populate_all_tags():
     global all_tags, all_txt_files
 
-    txt_pattern = os.path.join(f"{network_descriptions_path}/**/*.txt")
+    txt_pattern = os.path.join(f"{network_descriptions_path}\\**[!_OLD]\\*.txt") # Include all subdirectories, except for ones ending in '_OLD'
     print(f"SD Lora Tagger UI: txt_pattern={txt_pattern}")
     all_txt_files = glob.glob(txt_pattern, recursive=True)
     all_tags = {}
@@ -35,9 +36,13 @@ def save_text(*args):
 
     file_path = args[0]["label"]
     tags = args[1]
+    file_name = os.path.basename(file_path).split(".")[0]
 
     with open(file_path, "w", encoding='utf-8') as f:
-        f.write(tags)
+        if tags.startswith(file_name):
+            f.write(tags)
+        else:
+            f.write(f'{file_name}, {tags}')
 
     populate_all_tags()
 
@@ -98,14 +103,18 @@ def on_ui_tabs():
             file_rows = [search_bar]
             for txt_file in all_txt_files:
                 file_name = os.path.basename(txt_file).split(".")[0]
+                file_data = ''
 
-                with open(txt_file, "r", encoding='utf-8') as f:
-                    file_data = f.read()
+                with open(txt_file, "r", encoding='utf8') as f:
+                    data = f.read()
+                    file_data = data.replace(f"{file_name}, ", "") # Exclude file name as it is not a tag (will still be added on save)
+                    #print(f'{file_name}: "{file_data}"') 
 
                 set_visible = not ("nsfw" in file_data.lower().split(",") and hide_nsfw)
 
                 with gr.Row(elem_id=f"{file_name}_row_container", equal_height=True) as new_file_row:
                     with gr.Column(elem_id=f"{file_name}_textbox_col", scale=7):
+                        
                         # Adds file path to info for later reference when saving
                         textbox = gr.Textbox(label=file_name, value=file_data, elem_id=f"{file_name}_textbox",
                                              visible=set_visible)
@@ -120,13 +129,21 @@ def on_ui_tabs():
                         file_rows.append(save_btn)
 
         search_bar.input(fn=search_extra_networks, inputs=file_rows, outputs=file_rows)
+        # for entry in file_rows:
+        #     if isinstance(entry, gr.Textbox):
+        #         print(f'{entry.label}: "{entry.value}"')
 
     return [(sd_lora_tagger, "SD Lora Tagger", "sd_lora_tagger")]
 
 
+def create_display_mode_component(value, label, elem_id):
+    return gr.Dropdown(["By Tag", "By Model"], value=value, label=label, elem_id=elem_id)
+
 def on_ui_settings():
     section = ("sd_lora_tagger", "SD Lora Tagger")
-    shared.opts.add_option("sd_lora_tagger_hide_nsfw_extra_networks",
+    shared.opts.add_option(hide_nsfw_networks_key,
                            shared.OptionInfo(False, "Hide NSFW-tagged extra networks", section=section))
+    shared.opts.add_option(display_mode_key,
+                              shared.OptionInfo("0", "Table display mode (requires reload)", component=create_display_mode_component, section=section))
     update_hide_nsfw()
 

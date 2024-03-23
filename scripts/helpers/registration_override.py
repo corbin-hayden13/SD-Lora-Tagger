@@ -6,7 +6,8 @@ from pathlib import Path
 from modules import ui_extra_networks, sd_hijack, shared, sd_models, extra_networks
 from modules.textual_inversion.textual_inversion import Embedding
 
-from scripts.helpers.utils import lora, lycoris, extra_networks_lora, get_or_create_tags_file
+from scripts.helpers.utils import lora, lycoris, extra_networks_lora, list_to_csv
+from scripts.helpers.tag_manager import get_tags_by_model
 from scripts.globals import update_hide_nsfw, using_sd_next
 
 
@@ -43,7 +44,7 @@ class EmbeddingsPage(ui_extra_networks.ExtraNetworksPage):
         for embedding in embeddings:
             path, _ext = os.path.splitext(embedding.filename)
 
-            search_terms = f"{os.path.basename(embedding.filename)} {get_or_create_tags_file(self.descriptions_path, embedding.filename)}|||{self.extras}"
+            search_terms = f"{os.path.basename(embedding.filename)} {list_to_csv(get_tags_by_model(os.path.splitext(embedding.name)[0]))}|||{self.extras}"
             # Required for A111 1.8+
             if not using_sd_next:
                 search_terms = [search_terms]
@@ -86,7 +87,7 @@ class HypernetworksPage(ui_extra_networks.ExtraNetworksPage):
             path, _ext = os.path.splitext(path)
             filename = os.path.basename(f'{path}.{_ext}')
 
-            search_terms = f"{filename} {get_or_create_tags_file(self.descriptions_path, filename)}|||{self.extras}"
+            search_terms = f"{filename} {list_to_csv(get_tags_by_model(name))}|||{self.extras}"
             # Required for A111 1.8+
             if not using_sd_next:
                 search_terms = [search_terms]
@@ -132,7 +133,7 @@ class CheckpointsPage(ui_extra_networks.ExtraNetworksPage):
         for name, checkpoint in sd_models.checkpoints_list.items():
             path, _ext = os.path.splitext(checkpoint.filename)
 
-            search_terms = f"{os.path.basename(checkpoint.filename)} {get_or_create_tags_file(self.descriptions_path, checkpoint.filename)}|||{self.extras}"
+            search_terms = f"{os.path.basename(checkpoint.filename)} {list_to_csv(get_tags_by_model(name))}|||{self.extras}"
             # Required for A111 1.8+
             if not using_sd_next:
                 search_terms = [search_terms]
@@ -197,7 +198,7 @@ class LoraPage(ui_extra_networks.ExtraNetworksPage):
                 tags[' '.join(words[1:])] = words[0]
             # shared.log.debug(f'Lora: {path}: name={name} alias={alias} tags={tags}')
 
-            search_terms = f"{os.path.basename(lora_on_disk.filename)} {get_or_create_tags_file(self.descriptions_path, lora_on_disk.filename)}|||{self.extras}"
+            search_terms = f"{os.path.basename(lora_on_disk.filename)} {list_to_csv(get_tags_by_model(name))}|||{self.extras}"
             # Required for A111 1.8+
             if not using_sd_next:
                 search_terms = [search_terms]
@@ -249,7 +250,7 @@ class LyCORISPage(ui_extra_networks.ExtraNetworksPage):
             path, ext = os.path.splitext(lyco_on_disk.filename)
             sort_keys = {} if not 'get_sort_keys' in dir(self) else self.get_sort_keys(lyco_on_disk.filename)
 
-            search_terms = f"{os.path.basename(lyco_on_disk.filename)} {get_or_create_tags_file(self.descriptions_path, lyco_on_disk.filename)}|||{self.extras}"
+            search_terms = f"{os.path.basename(lyco_on_disk.filename)} {list_to_csv(get_tags_by_model(name))}|||{self.extras}"
             # Required for A111 1.8+
             if not using_sd_next:
                 search_terms = [search_terms]
@@ -301,13 +302,13 @@ def register_lycos(descriptions_path, extras: str):
 
 
 def register_all(description_paths, extras: str):
-    embedding_path, hypernetwork_path, checkpoint_path, lora_path, lycos_path = description_paths
-    register_embeddings(embedding_path, extras)
-    register_hypernetworks(hypernetwork_path, extras)
-    register_checkpoints(checkpoint_path, extras)
+    checkpoint_path, embedding_path, hypernetwork_path, lora_path, lycos_path = description_paths
+    register_checkpoints(checkpoint_path, extras=extras)
+    register_embeddings(embedding_path, extras=extras)
+    register_hypernetworks(hypernetwork_path, extras=extras)
     if lora_exists:
-        register_loras(lora_path, extras)
+        register_loras(lora_path, extras=extras)
         extra_networks.register_extra_network(extra_networks_lora.ExtraNetworkLora())
     if lycoris_exists:
-        register_lycos(lycos_path, extras)
+        register_lycos(lycos_path, extras=extras)
 
