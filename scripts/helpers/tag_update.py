@@ -5,9 +5,11 @@ from pathlib import Path
 from scripts.helpers.utils import csv_to_list
 from scripts.globals import network_descriptions_path
 
+DEPRECATED_SUFFIX = "_OLD"
+
 def rename_directory(network_name):
     old_name = get_network_directory(network_name)
-    new_name = old_name+"_OLD"
+    new_name = old_name + DEPRECATED_SUFFIX
 
     os.rename(old_name, new_name)
 
@@ -26,13 +28,13 @@ def get_network_directory(network_name):
 def get_existing_network_folders(network_names):
     exists = []
     for network_name in network_names:
-        if os.path.exists(get_network_directory(network_name)):
+        if os.path.exists(get_network_directory(network_name)) and not os.path.exists(get_network_directory(f"{network_name + DEPRECATED_SUFFIX}")):
             exists.append(network_name)
     return exists
 
 def update_network(network_name):
     print(f"SD Lora Tagger: Updating {network_name} networks...")
-    paths = glob(os.path.join(get_network_directory(network_name), "**[!_OLD]\\*.txt"), recursive=True)
+    paths = glob(os.path.join(get_network_directory(network_name), f"**[!{DEPRECATED_SUFFIX}]\\*.txt"), recursive=True)
 
     for tag_path in paths:
         model = tag_path.split('\\')[-1].split('.')[0]
@@ -43,7 +45,10 @@ def update_network(network_name):
         for tag in tags:
             tm.update_tag(tag, models=[model])
 
-    rename_directory(network_name)
+    try:
+        rename_directory(network_name)
+    except FileExistsError:
+        print(f"SD Lora Tagger: Failed to rename '{network_name}' directory. Tags were still updated.")
 
 
 
